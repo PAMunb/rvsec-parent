@@ -1330,8 +1330,6 @@ public class SootAnalyze {
 //		run(androidPlatformsDir, rtJarPath, apk, outputFile);
 		
 		
-//		List<String> apksComProblemas = List.of("/home/pedro/desenvolvimento/RV_ANDROID/apks/11/com.zzzmode.appopsx_125.apk");
-//		
 		for(int i=1; i< 29; i++) {
 			String idx = String.format("%02d", i);
 			System.out.println("\n\n\n**************************\n**************************\n**************************\n"+idx+"\n**************************\n**************************\n**************************");
@@ -1339,9 +1337,6 @@ public class SootAnalyze {
 			System.out.println("**************************\n**************************\n**************************");
 			File apksDir = new File("/home/pedro/desenvolvimento/RV_ANDROID/apks/"+idx);
 			for (File file : apksDir.listFiles()) {
-//				if(apksComProblemas.contains(file.getAbsolutePath())) {
-//					continue;
-//				}
 				run(androidPlatformsDir, rtJarPath, file.getAbsolutePath(), outputFile);
 			}
 		}

@@ -34,8 +34,11 @@ public aspect Coverage {
 	pointcut traced() : execution(* *.*(..)) && notwithin();
 	
 	before() : traced() {
+		// https://eclipse.dev/aspectj/doc/released/progguide/language-thisJoinPoint.html
+		// https://javadoc.io/doc/org.aspectj/aspectjweaver/1.9.2/org/aspectj/lang/JoinPoint.StaticPart.html
 		String sig = thisJoinPointStaticPart.getSignature().toLongString().strip();
 		String methodSignature = String.format("%s:::%s:::%s", thisJoinPointStaticPart.getSignature().getDeclaringTypeName(), thisJoinPointStaticPart.getSignature().getName(), sig.substring(sig.indexOf('(')));
+		// check if the message has already been logged
 		if(messages.add(methodSignature)) {
 			Log.v("RVSEC-COV", methodSignature);
 		}

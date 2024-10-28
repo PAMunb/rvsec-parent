@@ -4,61 +4,35 @@ import logging
 import os
 import sys
 import time
+from argparse import Namespace
 
+import utils
 from experiment import config as experiment_config
 from experiment import experiment_02
-import utils
-
-available_tools = {}
-output_formats = {}
+from tools.tool_spec import AbstractTool
 
 
-def qualified_name(p):
-    return p.replace(".py", "").replace("./", "").replace("/", ".")
-
-
-def load_tools():
-    """Load all available tools.
-
-     A tool must be defined in a subdirectory within
-     the tools folder, in a python module named tool.py.
-     This module must also declare a class named ToolSpec,
-     which should inherit from AbstractTool.
-    """
-    for subdir, dirs, files in os.walk('.' + os.sep + 'tools'):
-        for filename in files:
-            if filename == 'tool.py':
-                tool_module = importlib.import_module(qualified_name(subdir + os.sep + filename))
-                tool_class = getattr(tool_module, 'ToolSpec')
-                tool_instance = tool_class()
-                available_tools[tool_instance.name] = tool_instance
-
-
-def check_positive(value: int):
-    if value <= 0:
-        print("The value must be greater than zero: {}".format(value))
-        exit(1)
-
+available_tools: dict[str, AbstractTool] = {}
 
 program_description = f'''
-Executes the 'Experiment 01' ... 
+Executes the 'Experiment 02' ... 
 
 Examples:    
 $ python main.py --no_window -tools monkey droidbot -r 3 -t 120 300 600 900
+$ python main.py --no_window -c PATH_TO_EXECUTION_FILE
 $ python main.py --list-tools
 
 '''
 
+
 def run_cli():
     parser = create_argument_parser()
-    args = parser.parse_args()
+    args: Namespace = parser.parse_args()
     validate_args(args)
 
     # Logging configuration
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if args.debug else logging.INFO)
     logging.getLogger("androguard").setLevel(logging.WARNING)
-
-    tools = get_selected_tools(args)
 
     if args.list_tools:
         logging.info(" [Listing available tools] \n")
@@ -69,7 +43,7 @@ def run_cli():
     experiment_config.memory_file = args.c
     experiment_config.repetitions = args.r
     experiment_config.timeouts = args.t
-    experiment_config.tools = tools
+    experiment_config.tools = get_selected_tools(args)
     experiment_config.generate_monitors = not args.skip_monitors
     experiment_config.instrument = not args.skip_instrument
     experiment_config.static_analysis = not args.skip_static_analysis
@@ -87,10 +61,42 @@ def run_cli():
     logging.info('############# ENDING EXPERIMENT #############')
 
 
-def get_selected_tools(args):
+def load_tools():
+    """Load all available tools.
+
+     A tool must be defined in a subdirectory within
+     the tools folder, in a python module named tool.py.
+     This module must also declare a class named ToolSpec,
+     which should inherit from AbstractTool.
+    """
+    for subdir, dirs, files in os.walk('.' + os.sep + 'tools'):
+        for filename in files:
+            if filename == 'tool.py':
+                tool_module = importlib.import_module(qualified_name(subdir + os.sep + filename))
+                tool_class = getattr(tool_module, 'ToolSpec')
+                tool_instance = tool_class()
+                available_tools[tool_instance.name] = tool_instance
+    experiment_config.available_tools = available_tools.values()
+
+
+def qualified_name(p):
+    return p.replace(".py", "").replace("./", "").replace("/", ".")
+
+
+def check_positive(value: int):
+    if value <= 0:
+        print("The value must be greater than zero: {}".format(value))
+        exit(1)
+
+
+def get_selected_tools(args: Namespace):
+    return __get_tools(args.tools)
+
+
+def __get_tools(names: list[str]) -> list[AbstractTool]:
     tools = []
     for t in available_tools:
-        for tool in args.tools:
+        for tool in names:
             if t == tool:
                 tools.append(available_tools[t])
     # TODO
@@ -100,7 +106,7 @@ def get_selected_tools(args):
     return tools
 
 
-def validate_args(args):
+def validate_args(args: Namespace):
     # Validate arguments
     check_positive(args.r)
     for i in args.t:
@@ -136,15 +142,21 @@ def run_local():
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logging.getLogger("androguard").setLevel(logging.ERROR)
 
-    experiment_config.repetitions = 3
-    experiment_config.timeouts = [60, 90, 120, 180, 300]
-    experiment_config.tools = available_tools.values() # selected tools
-    experiment_config.available_tools = available_tools.values()
+    # experiment_config.repetitions = 3
+    # experiment_config.timeouts = [60, 90, 120, 180, 300]
+    # experiment_config.tools = __get_tools(
+    #     ["monkey", "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid",
+    #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
+
+    experiment_config.repetitions = 2
+    experiment_config.timeouts = [30, 45]
+    experiment_config.tools = __get_tools(["monkey", "ape"])
+
     experiment_config.generate_monitors = True
     experiment_config.instrument = True
     experiment_config.static_analysis = False
     experiment_config.no_window = True
-    experiment_config.skip_experiment = True
+    experiment_config.skip_experiment = False
 
     experiment_config.memory_file = ""
     # experiment_config.memory_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241009142453/execution_memory.json"
@@ -159,4 +171,3 @@ if __name__ == '__main__':
 
     run_cli()
     # run_local()
-

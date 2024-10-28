@@ -8,9 +8,10 @@ START = time.time()
 WORKING_DIR = os.getcwd()
 
 # APKS_DIR = os.path.join(WORKING_DIR, 'apks')
-APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', 'original')
+APKS_DIR = os.path.join(WORKING_DIR, 'apks_mini')
+# APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', 'original')
 RESULTS_DIR = os.path.join(WORKING_DIR, 'results')
-# INSTRUMENTED_DIR = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_examples"
+# INSTRUMENTED_DIR = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_experiment02/instrumented"
 INSTRUMENTED_DIR = os.path.join(WORKING_DIR, 'out')
 LIB_DIR = os.path.join(WORKING_DIR, 'lib')
 
@@ -25,8 +26,10 @@ RV_MONITOR_HOME = os.path.join(RVSEC_ROOT_DIR, 'rv-monitor')
 RV_MONITOR_BIN = os.path.join(RV_MONITOR_HOME, 'bin', 'rv-monitor')
 RVSEC_DIR = os.path.join(RVSEC_ROOT_DIR, 'rvsec')
 
-MOP_DIR = os.path.join(RVSEC_DIR, 'rvsec-mop', 'src', 'main', 'resources')
-# MOP_DIR = os.path.join(WORKING_DIR, 'mop')
+MOP_BASE_DIR = os.path.join(RVSEC_DIR, 'rvsec-mop', 'src', 'main', 'resources')
+MOP_DIR = os.path.join(MOP_BASE_DIR, 'jca')
+# MOP_DIR = os.path.join(MOP_BASE_DIR, 'generic')
+ASPECTS_DIR = os.path.join(MOP_BASE_DIR, 'aspect')
 MOP_OUT_DIR = os.path.join(WORKING_DIR, 'mop_out')
 # TODO (coverage.aj)
 MOP_INCLUDE_DIR = os.path.join(WORKING_DIR, 'mop-include')

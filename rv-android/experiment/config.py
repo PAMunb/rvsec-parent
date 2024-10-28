@@ -6,7 +6,6 @@ repetitions: int = 0
 timeouts: list[int] = []
 
 tools: list[AbstractTool] = []
-
 available_tools: list[AbstractTool] = []
 
 generate_monitors = True

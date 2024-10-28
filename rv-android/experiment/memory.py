@@ -1,33 +1,16 @@
-import importlib
-import logging as logging_api
-import os.path
-import shutil
-import sys
-
-#import analysis.methods_extractor as me
-import analysis.reachable_methods_mop as reach
-import analysis.results_analysis as res
-import utils
-from android import Android
-from app import App
-from commands.command import Command
-from constants import EXTENSION_APK, EXTENSION_METHODS, EXTENSION_LOGCAT, EXTENSION_TRACE
-from rvandroid import RvAndroid
-from rvsec import RVSec
-from experiment.task import Task
-from settings import *
+# import analysis.methods_extractor as me
 import json
-from tools.tool_spec import AbstractTool
-from constants import EXTENSION_METHODS, RVSEC_ERRORS, REPETITIONS, TIMEOUTS, TOOLS, SUMMARY, METHOD_COVERAGE, \
-    METHODS_JCA_COVERAGE, ACTIVITIES_COVERAGE
+
+from app import App
 from experiment import config as experiment_config
+from experiment.task import Task
 
 
 class Memory:
 
     def __init__(self):
         self.tasks = set()
-        # self.execution_memory = {}
+        self.execution_memory = {}
 
     def init(self, apks: list[App]):
         for apk_app in apks:
@@ -44,14 +27,13 @@ class Memory:
         sorted_tasks = sorted(self.tasks, key=_sort)
         return sorted_tasks
 
-    def read(self, memory_file: str):
-        # print("read={}".format(memory_file))
+    @staticmethod
+    def read(memory_file: str):
+        memory = Memory()
         with open(memory_file, 'r') as file:
             result = json.load(file)
-            # self.execution_memory, self.tasks = self.__from_result(result)
-            # print("self.execution_memory={}".format(self.execution_memory))
-            self.execution_memory, self.tasks = self.__from_result(result)
-            # print("self.tasks={}".format(self.tasks))
+            memory.execution_memory, memory.tasks = memory.__from_result(result)
+        return memory
 
     def write(self, memory_file: str):
         result = self.__to_result()
@@ -61,10 +43,12 @@ class Memory:
     def __to_result(self):
         result = {}
         for task in self.tasks:
-            result.setdefault(task.apk, {}).setdefault(task.repetition, {}).setdefault(task.timeout, {})[task.tool] = task.executed
+            result.setdefault(task.apk, {}).setdefault(task.repetition, {}).setdefault(task.timeout, {})[
+                task.tool] = task.executed
         return result
 
-    def __from_result(self, result):
+    @staticmethod
+    def __from_result(result):
         tasks = []
         # memory = {}
         for apk, rep_data in result.items():
@@ -77,7 +61,7 @@ class Memory:
                         task = Task(apk, rep, timeout, tool, executed)
                         # memory[apk][rep][timeout][tool] = task
                         tasks.append(task)
-        #return memory, tasks
+        # return memory, tasks
         return None, tasks
 
     def __str__(self):

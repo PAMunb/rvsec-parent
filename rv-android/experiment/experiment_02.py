@@ -3,6 +3,7 @@ import logging as logging_api
 import os.path
 import shutil
 import sys
+from typing import List
 
 # import analysis.methods_extractor as me
 import analysis.reachable_methods_mop as reach
@@ -38,22 +39,23 @@ def _execute(repetitions: int, timeouts: list[int], tools: list[AbstractTool], m
              instrument=True, static_analysis=True, skip_experiment=False, no_window=False):
     logging.info("Executing Experiment ...")
 
-    # generate monitors, instrument APKs and static analysis
+    # generate monitors, instrument APKs and run static analysis
     pre_process_apks(generate_monitors, instrument, static_analysis, INSTRUMENTED_DIR)
 
     if not skip_experiment:
         run_experiment(repetitions, timeouts, tools, memory_file, no_window)
 
-    # TODO post process
+    
 
     logging.info('Finished !!!')
 
 
-def run_experiment(repetitions, timeouts, tools, memory_file, no_window):
+def run_experiment(repetitions: int, timeouts: list[int], tools: list[AbstractTool], memory_file: str, no_window: bool):
     # retrieve the instrumented apks
-    apks = utils.get_apks(INSTRUMENTED_DIR)
+    apks: list[App] = utils.get_apks(INSTRUMENTED_DIR)
     logging.info(f"Instrumented APKs: {len(apks)}")
 
+    # creates map between names and objects
     init_maps(apks, tools)
 
     exec_manager = ExecutionManager()
@@ -61,15 +63,8 @@ def run_experiment(repetitions, timeouts, tools, memory_file, no_window):
     # exec_order = lambda x: (x.repetition, x.apk, x.timeout, x.tool)
     exec_manager.create_memory(repetitions, timeouts, tools, apks, memory_file, exec_order)
 
-    # cont = 0
-
     logging.info(exec_manager.statistics())
     for task in exec_manager.tasks:
-
-        # cont += 1
-        # if (cont == 50):
-        #     exit(1)
-
         if task.executed:
             logging.info(f"Skipping already executed task: {task}")
         else:
@@ -101,38 +96,38 @@ def run_experiment(repetitions, timeouts, tools, memory_file, no_window):
     #                     msg = "Error while running: APK={0}, rep={1}, timeout={2}, tool={3}. {4}"
     #                     logging.error(msg.format(apk.name, repetition, timeout, tool.name, ex))
     #
-    # post_process(base_results_dir)
+    # post_process(exec_manager.base_results_dir)
 
 
 def run(task: Task, results_dir: str, no_window: bool):
     # xxx(apks_map[task.apk], task.repetition, task.timeout, tools_map[task.tool], results_dir, no_window)
     logging.info(f"Running: {task}")
 
-    # logcat_cmd = Command('adb', ['logcat', '-v', 'tag', '-s', 'RVSEC', 'RVSEC-COV'])
-    #
-    # app = apks_map[task.apk]
-    # app_results_dir = os.path.join(results_dir, app.name)
-    # utils.create_folder_if_not_exists(app_results_dir)
-    #
-    # copy_methods_file(app, app_results_dir)
-    #
-    # base_name = "{0}__{1}__{2}__{3}".format(app.name, task.repetition, task.timeout, task.tool)
-    # logcat_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))
-    # log_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_TRACE))
-    #
-    # time.sleep(5)
-    # android = Android()
-    # with android.create_emulator(AVD_NAME, no_window) as emulator:
-    #     android.install_with_permissions(app)
-    #     # android.simulate_reboot() # TODO pq? eh usado no droidxp ...
-    #     with open(logcat_file, 'wb') as log_cat:
-    #         proc = logcat_cmd.invoke_as_deamon(stdout=log_cat)
-    #         tool = tools_map[task.tool]
-    #         tool.execute(app, task.timeout, log_file)
-    #         proc.kill()
+    logcat_cmd = Command('adb', ['logcat', '-v', 'tag', '-s', 'RVSEC', 'RVSEC-COV'])
+
+    app = apks_map[task.apk]
+    app_results_dir = os.path.join(results_dir, app.name)
+    utils.create_folder_if_not_exists(app_results_dir)
+
+    copy_methods_file(app, app_results_dir)
+
+    base_name = "{0}__{1}__{2}__{3}".format(app.name, task.repetition, task.timeout, task.tool)
+    logcat_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))
+    log_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_TRACE))
+
+    time.sleep(5)
+    android = Android()
+    with android.create_emulator(AVD_NAME, no_window) as emulator:
+        android.install_with_permissions(app)
+        # android.simulate_reboot() # TODO pq? eh usado no droidxp ...
+        with open(logcat_file, 'wb') as log_cat:
+            proc = logcat_cmd.invoke_as_deamon(stdout=log_cat)
+            tool = tools_map[task.tool]
+            tool.execute(app, task.timeout, log_file)
+            proc.kill()
 
 
-def init_maps(apks, tools):
+def init_maps(apks: list[App], tools: list[AbstractTool]):
     for apk in apks:
         apks_map[apk.name] = apk
     # for tool in available_tools: #TODO

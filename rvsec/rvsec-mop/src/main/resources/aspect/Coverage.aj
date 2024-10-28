@@ -1,6 +1,9 @@
 import android.util.Log;
+import java.util.HashSet;
+import java.util.Set;
 
 public aspect Coverage {
+	private Set<String> messages = new HashSet<>();
 	
 	pointcut notwithin() :
 		!within(sun..*) &&
@@ -33,7 +36,9 @@ public aspect Coverage {
 	before() : traced() {
 		String sig = thisJoinPointStaticPart.getSignature().toLongString().strip();
 		String methodSignature = String.format("%s:::%s:::%s", thisJoinPointStaticPart.getSignature().getDeclaringTypeName(), thisJoinPointStaticPart.getSignature().getName(), sig.substring(sig.indexOf('(')));
-		Log.v("RVSEC-COV", methodSignature);
+		if(messages.add(methodSignature)) {
+			Log.v("RVSEC-COV", methodSignature);
+		}
 	}
 	
 }

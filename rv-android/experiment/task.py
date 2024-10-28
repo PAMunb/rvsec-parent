@@ -1,5 +1,10 @@
 from enum import Enum
 
+class TaskStatus(Enum):
+    NOT_EXECUTED = 1
+    EXECUTING = 2
+    EXECUTED = 3
+    ERROR = 4
 
 class Task:
     cont = 0
@@ -12,7 +17,7 @@ class Task:
         self.repetition = repetition
         self.apk = apk
         self.executed = executed
-        self.time = 0 # time it took to run
+        self.time: int = 0 # time it took to run
         self.result = {}
         self.coverage = {}
 

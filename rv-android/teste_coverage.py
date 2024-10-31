@@ -7,9 +7,9 @@ from constants import EXTENSION_METHODS
 
 
 def tmp01():
-    result_dir = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20231212113846/app-debug.apk"
-    result_file = os.path.join(result_dir, "app-debug.apk__1__120__monkey.logcat")
-    apk_name = "app-debug.apk"
+    result_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241031113107/cryptoapp.apk"
+    result_file = os.path.join(result_dir, "cryptoapp.apk__1__180__monkey.logcat")
+    apk_name = "cryptoapp.apk"
     exec(apk_name, result_dir, result_file)
 
 

@@ -11,7 +11,6 @@ from experiment import config as experiment_config
 from experiment import experiment_02
 from tools.tool_spec import AbstractTool
 
-
 available_tools: dict[str, AbstractTool] = {}
 
 program_description = f'''
@@ -148,18 +147,18 @@ def run_local():
     #     ["monkey", "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid",
     #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
 
-    experiment_config.repetitions = 2
-    experiment_config.timeouts = [30, 45]
-    experiment_config.tools = __get_tools(["monkey", "ape"])
+    experiment_config.repetitions = 1
+    experiment_config.timeouts = [180]
+    experiment_config.tools = __get_tools(["monkey", "ape", "droidbot"])
 
     experiment_config.generate_monitors = True
     experiment_config.instrument = True
-    experiment_config.static_analysis = False
+    experiment_config.static_analysis = True
     experiment_config.no_window = True
     experiment_config.skip_experiment = False
 
     experiment_config.memory_file = ""
-    # experiment_config.memory_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241009142453/execution_memory.json"
+    # experiment_config.memory_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241029124150/execution_memory.json"
 
     experiment_02.execute()
 
@@ -169,5 +168,5 @@ def run_local():
 if __name__ == '__main__':
     load_tools()
 
-    run_cli()
-    # run_local()
+    # run_cli()
+    run_local()

@@ -33,7 +33,7 @@ class RVSec(object):
         # the option '-d' is not working 100% (moves generated *.aj to MOP_OUT_DIR, but not the rvm files)
         utils.move_files_by_extension(EXTENSION_RVM, MOP_DIR, MOP_OUT_DIR)
         # copy any custom aspectj file (from MOP_DIR and ASPECTS_DIR) to MOP_OUT_DIR
-        utils.copy_files_by_extension(EXTENSION_AJ, MOP_DIR, MOP_OUT_DIR, log_info=True)
+        # utils.copy_files_by_extension(EXTENSION_AJ, MOP_DIR, MOP_OUT_DIR, log_info=True)
         utils.copy_files_by_extension(EXTENSION_AJ, ASPECTS_DIR, MOP_OUT_DIR, log_info=True)
 
     @staticmethod

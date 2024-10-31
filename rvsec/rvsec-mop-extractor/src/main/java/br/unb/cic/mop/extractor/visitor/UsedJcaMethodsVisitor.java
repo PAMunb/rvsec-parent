@@ -44,7 +44,7 @@ public class UsedJcaMethodsVisitor extends VoidVisitorAdapter<Object> {
 	}
 
 	@Override
-	public void visit(JavaMOPSpec s, Object arg) {
+	public void visit(JavaMOPSpec s, Object arg) {		
 		if (!Objects.isNull(s.getEvents())) {
 			for (EventDefinition e : s.getEvents()) {
 				e.accept(this, arg);

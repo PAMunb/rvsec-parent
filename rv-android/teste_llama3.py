@@ -1,6 +1,6 @@
 from ollama import Client
 
-def teste01():
+def tmp01():
     client = Client(host='http://localhost:11434')
     response = client.chat(
         model="llama3",
@@ -15,4 +15,7 @@ def teste01():
 
 
 if __name__ == '__main__':
-    teste01()
+    # teste01()
+
+    from settings import RT_JAR
+    print(RT_JAR)

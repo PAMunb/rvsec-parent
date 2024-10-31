@@ -35,10 +35,7 @@ public class JavamopFacade {
 	}
 
 	private Set<String> listUsedClasses(File mopFile) {
-		if(debug) {
-			System.out.println("Parsing file: " + mopFile.getName());
-		}
-		MOPSpecFile specFile = getMopFile(mopFile);
+		MOPSpecFile specFile = getSpecFile(mopFile);
 
 		UsedJcaClassesVisitor usedClassesVisitor = new UsedJcaClassesVisitor();
 		specFile.accept(usedClassesVisitor, null);
@@ -47,15 +44,20 @@ public class JavamopFacade {
 	}
 
 	private Set<MopMethod> listUsedMethods(File mopFile) {
-		if(debug) {
-			System.out.println("Parsing file: " + mopFile.getName());
-		}
-		MOPSpecFile specFile = getMopFile(mopFile);
+		MOPSpecFile specFile = getSpecFile(mopFile);
 
 		UsedJcaMethodsVisitor visitor = new UsedJcaMethodsVisitor();
 		specFile.accept(visitor, null);
 
 		return visitor.getMethods();
+	}
+
+	private MOPSpecFile getSpecFile(File mopFile) {
+		if(debug) {
+			System.out.println("Parsing file: " + mopFile.getName());
+		}
+		MOPSpecFile specFile = getMopFile(mopFile);
+		return specFile;
 	}
 
 	private Set<File> getMopFiles(String mopSpecsDirPath) {

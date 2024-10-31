@@ -37,7 +37,7 @@ def process_coverage(called_methods: dict[str, set[str]], all_methods: dict):
             continue
         if coverage[clazz][IS_ACTIVITY]:
             coverage[SUMMARY][CALLED_ACTIVITIES] += 1
-        for m in called_methods[clazz]:
+        for m in called_methods[clazz]["methods"]:
             if m not in coverage[clazz][METHODS].keys():
                 continue
             coverage[clazz][METHODS][m][CALLED] = True

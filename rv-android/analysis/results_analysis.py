@@ -1,14 +1,15 @@
-import logging as logging_api
-
 import json
+import logging as logging_api
 import os
 
-from constants import *
+import analysis.coverage as cov
 import analysis.logcat_parser as parser
 import analysis.reachable_methods_mop as reach
-import analysis.coverage as cov
+import utils
+from constants import *
 
 logging = logging_api.getLogger(__name__)
+
 
 def process_results(results_dir: str, save_file=True):
     logging.info("Processing results in: {}".format(results_dir))
@@ -24,6 +25,7 @@ def process_results(results_dir: str, save_file=True):
         logging.info("Results saved in: {}".format(results_file))
 
     return results
+
 
 def process_apk(result):
     rvsec_errors = set()
@@ -63,7 +65,27 @@ def process_timeout(result):
     for t in result[TOOLS]:
         tool = result[TOOLS][t]
 
-        rvsec_errors.update(tool[RVSEC_ERRORS])
+        # tmp = tool[RVSEC_ERRORS]
+        # c = tool[RVSEC_METHODS_CALLED]
+        # print(tmp)
+        # print(c)
+        # print("")
+        #
+        # for e in tool[RVSEC_ERRORS]:
+        #     if e["unique_msg"] not in rvsec_error_msgs:
+        #         rvsec_error_msgs.add(e["unique_msg"])
+        #         # rvsec_errors.append(e)
+        #         rvsec_errors.append({
+        #             "spec": e["spec"],
+        #             "type": e["type"],
+        #             "classFullName": e["classFullName"],
+        #             "method": e["method"],
+        #             "message": e["message"],
+        #             ############ TODO guardar apenas o tempo (em sec) q levou pra achar ... task.start_time - e["date"]
+        #             "time": utils.datetime_to_milliseconds(e["date"]),
+        #             "unique_msg": e["unique_msg"]
+        #         })
+        rvsec_errors.update(tool[RVSEC_ERRORS]["messages"])
         rvsec_methods_called.update((tool[RVSEC_METHODS_CALLED]))
         sum_act_cov += tool[SUMMARY][ACTIVITIES_COVERAGE]
         sum_method_cov += tool[SUMMARY][METHOD_COVERAGE]
@@ -73,6 +95,11 @@ def process_timeout(result):
                        METHOD_COVERAGE_AVG: (sum_method_cov / len(result[TOOLS])),
                        METHODS_JCA_COVERAGE_AVG: (sum_method_jca_reachable_cov / len(result[TOOLS])),
                        RVSEC_ERRORS_COUNT: len(rvsec_errors)}
+    # result[RVSEC_ERRORS] = {
+    #     "total": len(rvsec_error_msgs),
+    #     "messages": list(rvsec_error_msgs),
+    #     "details": rvsec_errors
+    # }
     result[RVSEC_ERRORS] = list(rvsec_errors)
     result[RVSEC_METHODS_CALLED] = list(rvsec_methods_called)
 
@@ -109,7 +136,24 @@ def initialize_results(results_dir):
                             #   as chaves são os nomes das classes e o valor é o conjunto dos métodos chamados
                             rvsec_errors, called_methods = parser.parse_logcat_file(os.path.join(apk_folder_path, file))
 
-                            # calcula a cobertura de codigo
+                            rvsec_error_msgs = set()
+                            errors = []
+                            for e in rvsec_errors:
+                                if e["unique_msg"] not in rvsec_error_msgs:
+                                    rvsec_error_msgs.add(e["unique_msg"])
+                                    # rvsec_errors.append(e)
+                                    errors.append({
+                                        "spec": e["spec"],
+                                        "type": e["type"],
+                                        "classFullName": e["classFullName"],
+                                        "method": e["method"],
+                                        "message": e["message"],
+                                        ############ TODO guardar apenas o tempo (em sec) q levou pra achar ... task.start_time - e["date"]
+                                        "time": utils.datetime_to_milliseconds(e["date"]),
+                                        "unique_msg": e["unique_msg"]
+                                    })
+
+                            # TODO calcula a cobertura de codigo
                             coverage = cov.process_coverage(called_methods, all_methods)
 
                             results[apk][SUMMARY][TOTAL_CLASSES] = coverage[SUMMARY][TOTAL_CLASSES]
@@ -127,19 +171,27 @@ def initialize_results(results_dir):
 
                             jca_methods_called = set()
                             for clazz in called_methods:
-                                #TODO se a classe nao estiver em coverage provavelmente declarou um pacote no manifest e implementou as coisas em outro pacote
+                                # TODO se a classe nao estiver em coverage provavelmente declarou um pacote no manifest e implementou as coisas em outro pacote
                                 if clazz in coverage:
-                                    for method in called_methods[clazz]:
+                                    methods = called_methods[clazz]["methods"]
+                                    for method in methods:
                                         sig = "{}.{}".format(clazz, method)
+                                        print(sig)
                                         if sig not in jca_methods_called and \
                                                 method in coverage[clazz][METHODS].keys() and \
                                                 coverage[clazz][METHODS][method][CALLED] and \
                                                 coverage[clazz][METHODS][method][USE_JCA]:
                                             jca_methods_called.add(sig)
-
-                            results[apk][REPETITIONS][rep][TIMEOUTS][timeout][TOOLS][tool] = {SUMMARY: summary,
-                                                                                              RVSEC_ERRORS: list(rvsec_errors),
-                                                                                              RVSEC_METHODS_CALLED: list(jca_methods_called)}
+                            rvsec_errors_dict = {
+                                "total": len(rvsec_error_msgs),
+                                "messages": list(rvsec_error_msgs),
+                                "details": errors
+                            }
+                            tool_obj = {SUMMARY: summary,
+                                        "start_time": 0,  # TODO ......................................
+                                        RVSEC_ERRORS: rvsec_errors_dict,
+                                        RVSEC_METHODS_CALLED: list(jca_methods_called)}
+                            results[apk][REPETITIONS][rep][TIMEOUTS][timeout][TOOLS][tool] = tool_obj
     return results
 
 

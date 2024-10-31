@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging as logging_api
 import hashlib
 import logging
@@ -170,3 +171,11 @@ def to_readable_time(duration: float):
     else:
         time = '{0} seconds'.format(int(duration))
     return time
+
+
+def datetime_to_milliseconds(date: datetime):
+    return int(round(date.timestamp() * 1000))
+
+
+def milliseconds_to_datetime(timestamp: int) -> datetime:
+    return datetime.fromtimestamp(timestamp / 1000)

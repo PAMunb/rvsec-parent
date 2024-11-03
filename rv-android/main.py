@@ -138,7 +138,7 @@ def create_argument_parser():
 
 
 def run_local():
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logging.getLogger("androguard").setLevel(logging.ERROR)
 
     # experiment_config.repetitions = 3
@@ -147,13 +147,17 @@ def run_local():
     #     ["monkey", "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid",
     #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
 
+    _min = 60
+    _10_min = 10 * _min
+    _30_min = 3 * _10_min
+
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [180]
-    experiment_config.tools = __get_tools(["monkey", "ape", "droidbot"])
+    experiment_config.timeouts = [_10_min]
+    experiment_config.tools = __get_tools(["monkey", "ape", "fastbot", "droidmate"])
 
     experiment_config.generate_monitors = True
     experiment_config.instrument = True
-    experiment_config.static_analysis = True
+    experiment_config.static_analysis = False
     experiment_config.no_window = True
     experiment_config.skip_experiment = False
 

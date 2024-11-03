@@ -14,6 +14,9 @@ EXTENSION_METHODS = ".methods"
 EXTENSION_GESDA = ".gesda"
 EXTENSION_GATOR = ".wtg"
 
+EXECUTION_MEMORY_FILENAME = "execution_memory.json"
+RESULTS_FILENAME = "results_analysis.json"
+
 # COLUMNS (reports, results)
 
 # Quantidade total de activities (no apk)

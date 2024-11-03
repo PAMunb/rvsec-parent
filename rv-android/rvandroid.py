@@ -24,13 +24,13 @@ class RvAndroid(object):
     def __init__(self):
         pass
 
-    def instrument_apks(self, results_dir: str, force_instrumentation=False):
+    def instrument_apks(self, results_dir: str, force_instrumentation=False, apks_dir=APKS_DIR):
         errors = {}
 
         # clean directories, copy libraries and create INSTRUMENTED_DIR (if not exists)
         self.prepare_instrumentation(results_dir)
         # retrieves the APKs to be instrumented
-        apks = utils.get_apks(APKS_DIR)
+        apks = utils.get_apks(apks_dir)
 
         total_apks = len(apks)
         cont = 0
@@ -61,6 +61,7 @@ class RvAndroid(object):
                 logging.info("Errors saved in: {}".format(errors_file))
             for error in errors:
                 logging.warning("ERROR: {}, tool={}".format(error, errors[error]["tool"]))
+        return errors
 
     def prepare_instrumentation(self, results_dir=INSTRUMENTED_DIR):
         self.clear([LIB_TMP_DIR, TMP_DIR, RVM_TMP_DIR])
@@ -80,7 +81,6 @@ class RvAndroid(object):
 
         start = time.time()
         logging.info("Instrumenting: {}".format(app.name))
-        # TODO mudar nome do metodo pois nao decompila ... parece q transforma/converte
         self.__decompile_apk(app)
         self.__include_generated_monitors()
         self.__weave_monitors(app)

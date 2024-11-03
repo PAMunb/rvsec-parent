@@ -3,6 +3,7 @@ import csv
 import json
 import os
 import sys
+import time
 
 import networkx as nx
 from androguard.core.analysis.analysis import Analysis, MethodAnalysis
@@ -97,7 +98,9 @@ def get_class_name(m: MethodAnalysis):
 
 
 def get_javamop_methods(mop_specs_dir: str):
-    methods_file = os.path.join(WORKING_DIR, 'methods_used_in_specs.txt')
+    current_time_ms = str(int(round(time.time() * 1000)))
+    methods_filename = "{}_{}".format(current_time_ms, 'methods_used_in_specs.txt')
+    methods_file = os.path.join(WORKING_DIR, methods_filename)
     mop_extractor_jar = os.path.join(LIB_DIR, 'mop-extractor', 'mop-extractor.jar')
     mop_extractor_cmd = Command("java", [
         '-jar',

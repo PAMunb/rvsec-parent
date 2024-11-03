@@ -19,7 +19,8 @@ class Task:
         self.repetition = repetition
         self.apk = apk
         self.executed = executed
-        self.start_time = start_time
+        self.start_time = start_time  # time.time(): Return the current time in seconds since the Epoch
+        self.finish_time = 0
         self.time: int = 0  # time (in seconds) it took to run
         self.result: list[dict] = []
         self.coverage = {}
@@ -33,4 +34,4 @@ class Task:
                                                                      self.tool)
 
     def __repr__(self):
-        return "[{},{},{},{},{}]".format(self.id, self.apk, self.repetition, self.timeout, self.tool)
+        return "[{},{},{},{},{},{}]".format(self.id, self.apk, self.repetition, self.timeout, self.tool, self.executed)

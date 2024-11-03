@@ -6,13 +6,12 @@ from datetime import datetime
 
 import utils
 from app import App
-from constants import EXTENSION_LOGCAT, EXTENSION_TRACE, EXTENSION_METHODS
+from constants import EXTENSION_LOGCAT, EXTENSION_TRACE, EXTENSION_METHODS, EXECUTION_MEMORY_FILENAME
 from experiment.memory import Memory
 from experiment.task import Task
 from settings import *
 from tools.tool_spec import AbstractTool
 
-EXECUTION_MEMORY_FILENAME = "execution_memory.json"
 
 logging = logging_api.getLogger(__name__)
 
@@ -28,7 +27,7 @@ class ExecutionManager:
         self.start_time = datetime.now()
         self.finish_time = None
 
-    def create_memory(self, repetitions: int, timeouts: list[int], tools: list[AbstractTool], apks: list[App],
+    def create_memory(self, apks: list[App], repetitions: int, timeouts: list[int], tools: list[AbstractTool],
                       memory_file: str, _sort=lambda x: (x.repetition, x.timeout, x.tool, x.apk)):
         # if the file exists, resume execution
         if os.path.exists(memory_file):
@@ -54,7 +53,7 @@ class ExecutionManager:
             if task.executed:
                 self.executed_tasks.add(task)
 
-    def statistics(self):
+    def statistics(self) -> dict:
         pct = (len(self.executed_tasks) * 100) / len(self.tasks)
         data = {"tasks": len(self.tasks),
                 "completed": len(self.executed_tasks),
@@ -73,12 +72,12 @@ class ExecutionManager:
 
     def finish_task(self, task):
         task.executed = True
-        task.time = time.time() - task.start_time
+        task.finish_time = time.time() - task.start_time
         self.executed_tasks.add(task)
         self.write_memory()
 
-    def error(self, task, ex):
-        task.error = ex
+    def task_error(self, task, ex):
+        task.error = str(ex)
         self.write_memory()
 
     def read_memory(self) -> Memory:

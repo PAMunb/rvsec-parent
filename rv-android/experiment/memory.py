@@ -1,36 +1,76 @@
 # import analysis.methods_extractor as me
 import json
-
+from datetime import datetime
 from app import App
 from experiment.task import Task
-import utils
+from collections import defaultdict
+
 
 class Memory:
 
     def __init__(self):
         self.tasks = set()
+        self.tasks_map = defaultdict(dict)
 
     def init(self, repetitions: int, timeouts: list[int], tools: list[str], apks: list[App]):
+        # for apk_app in apks:
+        #     apk = apk_app.name
+        #     tasks_map_level = self.tasks_map.setdefault(apk, {})
+        #     for rep in range(repetitions):
+        #         repetition = rep + 1
+        #         repetition_map_level = tasks_map_level.setdefault(str(repetition), {})
+        #         for timeout in timeouts:
+        #             timeout_map_level = repetition_map_level.setdefault(str(timeout), {})
+        #             for tool in tools:
+        #                 timeout_map_level[tool] = Task(apk, repetition, timeout, tool)
+        #                 task = Task(apk, repetition, timeout, tool)
+        #                 self.tasks.add(task)
+        self.tasks_map = {}
         for apk_app in apks:
             apk = apk_app.name
+            if apk not in self.tasks_map:
+                self.tasks_map[apk] = {}
             for rep in range(repetitions):
                 repetition = rep + 1
+                if repetition not in self.tasks_map[apk]:
+                    self.tasks_map[apk][repetition] = {}
                 for timeout in timeouts:
+                    if timeout not in self.tasks_map[apk][repetition]:
+                        self.tasks_map[apk][repetition][timeout] = {}
                     for tool in tools:
                         task = Task(apk, repetition, timeout, tool)
+                        self.tasks_map[apk][repetition][timeout][tool] = task
                         self.tasks.add(task)
+        # for apk_app in apks:
+        #     apk = apk_app.name
+        #     for rep in range(repetitions):
+        #         repetition = rep + 1
+        #         for timeout in timeouts:
+        #             for tool in tools:
+        #                 task = Task(apk, repetition, timeout, tool)
+        #                 self.tasks_map[apk][repetition][timeout][tool] = task
+        #                 self.tasks.add(task)
 
     def get_tasks(self, _sort=lambda x: (x.repetition, x.timeout, x.tool, x.apk)) -> list[Task]:
         sorted_tasks: list[Task]
         sorted_tasks = sorted(self.tasks, key=_sort)
         return sorted_tasks
 
+    def get_task(self, apk: str, repetition: str, timeout: str, tool: str) -> Task | None:
+        try:
+            xxx = self.tasks_map[apk][repetition][timeout][tool]
+            return xxx
+        except BaseException:
+            return None
+
     @staticmethod
     def read(memory_file: str):
         memory = Memory()
         with open(memory_file, "r") as file:
             result = json.load(file)
-            memory.tasks = memory.__from_result(result)
+            memory.tasks, memory.tasks_map = memory.__from_result(result)
+            print(f"memory.tasks_map={memory.tasks_map}")
+            print(f"memory.tasks={memory.tasks}")
         return memory
 
     def write(self, memory_file: str):
@@ -53,17 +93,27 @@ class Memory:
     @staticmethod
     def __from_result(result):
         tasks = []
+        mapa = {}
         for apk, rep_data in result.items():
+            if apk not in mapa:
+                mapa[apk] = {}
             for rep, timeout_data in rep_data.items():
+                if rep not in mapa[apk]:
+                    mapa[apk][rep] = {}
                 for timeout, tool_data in timeout_data.items():
+                    if timeout not in mapa[apk][rep]:
+                        mapa[apk][rep][timeout] = {}
                     for tool, data in tool_data.items():
                         task = Task(apk, rep, timeout, tool)
                         task.executed = data["executed"]
-                        # TODO vem str, int ou datetime?
-                        task.start_time = data["start_time"]
+                        # TODO vem str, int ou datetime? ... >>> float
+                        # time.time()
+                        task.start_time = datetime.fromtimestamp(data["start_time"])
                         task.error = data["error"]
+                        mapa[apk][rep][timeout][tool] = task
+                        print(f"mapa[{apk}][{rep}][{timeout}][{tool}] = {task}")
                         tasks.append(task)
-        return tasks
+        return tasks, mapa
 
     def __str__(self):
         return "Memory=[tasks={}]".format(len(self.tasks))

@@ -149,7 +149,7 @@ if __name__ == '__main__':
     # parse_error(error)
 
 
-    log_file = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241031080626/cryptoapp.apk/cryptoapp.apk__1__45__monkey.logcat"  # Substitua pelo nome do seu arquivo
+    log_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241101133120/cryptoapp.apk/cryptoapp.apk__1__30__monkey.logcat"  # Substitua pelo nome do seu arquivo
     # rvsec_errors, called_methods = execute(log_file)
     import analysis.logcat_parser as parser
     rvsec_errors, called_methods = parser.parse_logcat_file(log_file)

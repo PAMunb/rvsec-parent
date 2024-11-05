@@ -45,3 +45,25 @@ class RvError:
         if not isinstance(other, RvError):
             return NotImplemented
         return self.unique_msg == other.unique_msg
+
+
+class RvCoverage:
+
+    def __init__(self, clazz: str, method: str, params: str):
+        self.clazz = clazz
+        self.method = method
+        self.params = params
+        #################################
+        self.unique_msg: str = "{}:::{}:::{}" \
+            .format(clazz, method, params)
+        self.original_msg: str = ""
+        self.time_occurred: datetime = datetime.now()
+        self.time_since_task_start: int = 0  # in seconds
+
+    def __str__(self):
+        return f"RvCoverage(clazz={self.clazz}, method={self.method}, params={self.params}, time_occurred={self.time_occurred}, time_since_task_start={self.time_since_task_start})"
+
+    def __eq__(self, other):
+        if not isinstance(other, RvCoverage):
+            return NotImplemented
+        return self.unique_msg == other.unique_msg

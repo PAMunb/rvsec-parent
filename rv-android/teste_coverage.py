@@ -1,26 +1,20 @@
 import json
 import os
 import analysis.coverage as cov
-import analysis.logcat_parser as parser
+import log.logcat_parser as parser
 import analysis.reachable_methods_mop as reach
 from constants import EXTENSION_METHODS
 
 
 def tmp01():
-    result_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241031113107/cryptoapp.apk"
-    result_file = os.path.join(result_dir, "cryptoapp.apk__1__180__monkey.logcat")
     apk_name = "cryptoapp.apk"
-    exec(apk_name, result_dir, result_file)
+    base_results_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
+    result_dir = os.path.join(base_results_dir, "20241105090059", apk_name)
+    result_file = os.path.join(result_dir, "cryptoapp.apk__1__60__monkey.logcat")
+    execute(apk_name, result_dir, result_file)
 
 
-def tmp02():
-    apk_name = "com.example.openpass_1.apk"
-    result_dir = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20231212113846/com.example.openpass_1.apk"
-    result_file = os.path.join(result_dir, "com.example.openpass_1.apk__1__120__monkey.logcat")
-    exec(apk_name, result_dir, result_file)
-
-
-def exec(apk_name, result_dir, result_file):
+def execute(apk_name, result_dir, result_file):
     rvsec_errors, called_methods = parser.parse_logcat_file(result_file)
 
     all_methods = {}

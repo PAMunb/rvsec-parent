@@ -152,17 +152,18 @@ def run_local():
     _30_min = 3 * _10_min
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [_10_min]
-    experiment_config.tools = __get_tools(["monkey", "ape", "fastbot", "droidmate"])
+    experiment_config.timeouts = [_min]
+    experiment_config.tools = __get_tools(["monkey", "ape"])
 
-    experiment_config.generate_monitors = True
-    experiment_config.instrument = True
+    experiment_config.generate_monitors = False
+    experiment_config.instrument = False
     experiment_config.static_analysis = False
     experiment_config.no_window = True
     experiment_config.skip_experiment = False
 
     experiment_config.memory_file = ""
-    # experiment_config.memory_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241029124150/execution_memory.json"
+    # base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
+    # experiment_config.memory_file = os.path.join(base_dir, "20241105102541", "execution_memory.json")
 
     experiment_02.execute()
 

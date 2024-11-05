@@ -1,8 +1,6 @@
 from datetime import datetime
 import re
 
-from analysis import logcat_parser
-
 
 def parse_logcat(log_file: str):
     pattern = r"(\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)\s+(\d+)\s+(\w)\s+(\S+)\s*:\s*(.*)"
@@ -114,8 +112,6 @@ def to_datetime(date: str, time: str):
 
 if __name__ == '__main__':
 
-    import utils
-
     #
     #
     # # print(to_datetime("10-29", "08:31:14.504"))
@@ -149,9 +145,9 @@ if __name__ == '__main__':
     # parse_error(error)
 
 
-    log_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241101133120/cryptoapp.apk/cryptoapp.apk__1__30__monkey.logcat"  # Substitua pelo nome do seu arquivo
+    log_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241102083427/cryptoapp.apk/cryptoapp.apk__1__600__ape.logcat"  # Substitua pelo nome do seu arquivo
     # rvsec_errors, called_methods = execute(log_file)
-    import analysis.logcat_parser as parser
+    import log.logcat_parser as parser
     rvsec_errors, called_methods = parser.parse_logcat_file(log_file)
 
     print("ERROS: {}".format(len(rvsec_errors)))

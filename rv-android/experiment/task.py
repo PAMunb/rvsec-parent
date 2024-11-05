@@ -1,11 +1,11 @@
 from enum import Enum
 
 
-class TaskStatus(Enum):
-    NOT_EXECUTED = 1
-    EXECUTING = 2
-    EXECUTED = 3
-    ERROR = 4
+# class TaskStatus(Enum):
+#     NOT_EXECUTED = 1
+#     EXECUTING = 2
+#     EXECUTED = 3
+#     ERROR = 4
 
 
 class Task:

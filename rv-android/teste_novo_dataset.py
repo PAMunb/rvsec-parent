@@ -38,19 +38,21 @@ DATE_FORMAT = "%Y-%m-%d"
 
 
 def execute(spreadsheet, apks_dir):
-    apks = get_fdroid_info()
-    get_playstore_info(apks)
+    # apks = get_fdroid_info()
+    # get_playstore_info(apks)
+    # save_results(apks, spreadsheet)
+
+    apks = read_file(spreadsheet)
+
+    # download_apks(apks, apks_dir)
+    # save_results(apks, spreadsheet)
+
+    # reachability_analysis(apks, apks_dir, spreadsheet)
+    instrument_apks(apks, apks_dir)
     save_results(apks, spreadsheet)
 
-    # apks = read_file(spreadsheet)
-
-    download_apks(apks, apks_dir)
-    save_results(apks, spreadsheet)
-
-    reachability_analysis(apks, apks_dir, spreadsheet)
-    # instrument_apks(apks, apks_dir)
     # rank_apks(apks)
-    save_results(apks, spreadsheet)
+    # save_results(apks, spreadsheet)
     print("FIM DE FESTA !!!")
 
 
@@ -465,7 +467,7 @@ def remove_unused_apks(apks, apks_dir):
         if not apk["reachesMOP"]:
             filename = apk[FILENAME]
             filepath = os.path.join(apks_dir, filename)
-            if os.path.exists(filepath):
+            if os.path.exists(filepath) and filename.endswith(EXTENSION_APK):
                 print(f"Removing APK: {filepath}")
                 os.remove(filepath)
 

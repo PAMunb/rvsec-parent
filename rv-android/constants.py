@@ -20,27 +20,32 @@ RESULTS_FILENAME = "results_analysis.json"
 # COLUMNS (reports, results)
 
 # Quantidade total de activities (no apk)
-TOTAL_ACTIVITIES = 'total_activities'
+TOTAL_ACTIVITIES = "total_activities"
 # Quantidade total de classes (apenas as classes contidas no pacote definido no manifest)
-TOTAL_CLASSES = 'total_classes'
+TOTAL_CLASSES = "total_classes"
 # Quantidade total de métodos (apenas os métodos das classes contidas no pacote definido no manifest)
-TOTAL_METHODS = 'total_methods'
+TOTAL_METHODS = "total_methods"
 # Quantidade total de métodos alcançáveis que usam jca (utilizados nas especificações ... apenas os métodos das classes contidas no pacote definido no manifest)
-TOTAL_METHODS_JCA_REACHABLE = 'total_methods_jca_reachable'
+TOTAL_METHODS_JCA_REACHABLE = "total_methods_jca_reachable"
 
 # Quantidade de atividades chamadas
-CALLED_ACTIVITIES = 'called_activities'
+CALLED_ACTIVITIES = "called_activities"
 # Quantidade de métodos chamados
-CALLED_METHODS = 'called_methods'
+CALLED_METHODS = "called_methods"
 # Quantidade de métodos chamados que usam jca e são alcançáveis
-CALLED_METHODS_JCA_REACHABLE = 'called_methods_jca_reachable'
+CALLED_METHODS_JCA_REACHABLE = "called_methods_jca_reachable"
 
-ACTIVITIES_COVERAGE = 'activities_coverage'
-METHOD_COVERAGE = 'method_coverage'
+# cobertura de atividades: (called_activities * 100) / total_activities
+ACTIVITIES_COVERAGE = "activities_coverage"
+# cobertura de atividades em relacao ao total de classes: (called_activities * 100) / total_classes
+ACTIVITIES_COVERAGE_TOTAL = "activities_coverage_total"
+# cobertura de metodos: (called_methods * 100) / total_methods
+METHOD_COVERAGE = "method_coverage"
+# cobertura do metodos alcancaveis que usam MOP: (called_methods_jca_reachable * 100) / total_methods_jca_reachable
 METHODS_JCA_COVERAGE = "methods_jca_reachable_coverage"
 
-ACTIVITIES_COVERAGE_AVG = 'activities_coverage_avg'
-METHOD_COVERAGE_AVG = 'method_coverage_avg'
+ACTIVITIES_COVERAGE_AVG = "activities_coverage_avg"
+METHOD_COVERAGE_AVG = "method_coverage_avg"
 METHODS_JCA_COVERAGE_AVG = "methods_jca_reachable_coverage_avg"
 
 METHODS_JCA_REACHABLE = "methods_jca_reachable"
@@ -56,6 +61,6 @@ RVSEC_ERRORS = "rvsec_errors"
 RVSEC_ERRORS_COUNT = "rvsec_errors_count"
 RVSEC_METHODS_CALLED = "rvsec_methods_called"
 
-TOOLS = 'tools'
-TIMEOUTS = 'timeouts'
-REPETITIONS = 'repetitions'
+TOOLS = "tools"
+TIMEOUTS = "timeouts"
+REPETITIONS = "repetitions"

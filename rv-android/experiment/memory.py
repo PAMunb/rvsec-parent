@@ -1,6 +1,8 @@
 # import analysis.methods_extractor as me
 import json
 from datetime import datetime
+
+import utils
 from app import App
 from experiment.task import Task
 from collections import defaultdict
@@ -13,43 +15,31 @@ class Memory:
         self.tasks_map = defaultdict(dict)
 
     def init(self, repetitions: int, timeouts: list[int], tools: list[str], apks: list[App]):
+        # self.tasks_map = {}
         # for apk_app in apks:
         #     apk = apk_app.name
-        #     tasks_map_level = self.tasks_map.setdefault(apk, {})
+        #     if apk not in self.tasks_map:
+        #         self.tasks_map[apk] = {}
         #     for rep in range(repetitions):
         #         repetition = rep + 1
-        #         repetition_map_level = tasks_map_level.setdefault(str(repetition), {})
+        #         if repetition not in self.tasks_map[apk]:
+        #             self.tasks_map[apk][repetition] = {}
         #         for timeout in timeouts:
-        #             timeout_map_level = repetition_map_level.setdefault(str(timeout), {})
-        #             for tool in tools:
-        #                 timeout_map_level[tool] = Task(apk, repetition, timeout, tool)
-        #                 task = Task(apk, repetition, timeout, tool)
-        #                 self.tasks.add(task)
-        self.tasks_map = {}
-        for apk_app in apks:
-            apk = apk_app.name
-            if apk not in self.tasks_map:
-                self.tasks_map[apk] = {}
-            for rep in range(repetitions):
-                repetition = rep + 1
-                if repetition not in self.tasks_map[apk]:
-                    self.tasks_map[apk][repetition] = {}
-                for timeout in timeouts:
-                    if timeout not in self.tasks_map[apk][repetition]:
-                        self.tasks_map[apk][repetition][timeout] = {}
-                    for tool in tools:
-                        task = Task(apk, repetition, timeout, tool)
-                        self.tasks_map[apk][repetition][timeout][tool] = task
-                        self.tasks.add(task)
-        # for apk_app in apks:
-        #     apk = apk_app.name
-        #     for rep in range(repetitions):
-        #         repetition = rep + 1
-        #         for timeout in timeouts:
+        #             if timeout not in self.tasks_map[apk][repetition]:
+        #                 self.tasks_map[apk][repetition][timeout] = {}
         #             for tool in tools:
         #                 task = Task(apk, repetition, timeout, tool)
         #                 self.tasks_map[apk][repetition][timeout][tool] = task
         #                 self.tasks.add(task)
+        self.tasks_map = defaultdict(lambda: defaultdict(lambda: defaultdict(Task)))
+        for apk_app in apks:
+            apk = apk_app.name
+            for repetition in range(1, repetitions + 1):
+                for timeout in timeouts:
+                    for tool in tools:
+                        task = Task(apk, repetition, timeout, tool)
+                        self.tasks_map[apk][repetition][timeout] = task
+                        self.tasks.add(task)
 
     def get_tasks(self, _sort=lambda x: (x.repetition, x.timeout, x.tool, x.apk)) -> list[Task]:
         sorted_tasks: list[Task]
@@ -58,8 +48,7 @@ class Memory:
 
     def get_task(self, apk: str, repetition: str, timeout: str, tool: str) -> Task | None:
         try:
-            xxx = self.tasks_map[apk][repetition][timeout][tool]
-            return xxx
+            return self.tasks_map[apk][repetition][timeout][tool]
         except BaseException:
             return None
 
@@ -79,8 +68,10 @@ class Memory:
             json.dump(result, outfile)
 
     def __to_result(self):
+        print("************** __to_result")
         result = {}
         for task in self.tasks:
+            print(f"\t - task={task}, start_time={task.start_time}, type={type(task.start_time)}")
             result.setdefault(task.apk, {}).setdefault(task.repetition, {}).setdefault(task.timeout, {})[
                 task.tool] = {"executed": task.executed,
                               "start_time": task.start_time,
@@ -92,6 +83,7 @@ class Memory:
 
     @staticmethod
     def __from_result(result):
+        print("************* __from_result ....")
         tasks = []
         mapa = {}
         for apk, rep_data in result.items():
@@ -104,11 +96,14 @@ class Memory:
                     if timeout not in mapa[apk][rep]:
                         mapa[apk][rep][timeout] = {}
                     for tool, data in tool_data.items():
-                        task = Task(apk, rep, timeout, tool)
+                        task = Task(apk, int(rep), int(timeout), tool)
+                        print(f"\t - task={task}")
                         task.executed = data["executed"]
                         # TODO vem str, int ou datetime? ... >>> float
                         # time.time()
-                        task.start_time = datetime.fromtimestamp(data["start_time"])
+                        date = datetime.fromtimestamp(data["start_time"])
+                        task.start_time = utils.datetime_to_milliseconds(date)
+                        print(f"\t\t - data[\"start_time\"]={data["start_time"]}, date={date}, date_type={type(date)}, milis={utils.datetime_to_milliseconds(date)}")
                         task.error = data["error"]
                         mapa[apk][rep][timeout][tool] = task
                         print(f"mapa[{apk}][{rep}][{timeout}][{tool}] = {task}")

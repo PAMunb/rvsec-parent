@@ -12,6 +12,6 @@
 
 #python main.py --no_window -tools monkey droidbot droidbot_dfs_greedy droidbot_bfs_naive droidbot_bfs_greedy humanoid droidmate ape -r 3 -t 60 120 180 300
 
-python main.py --no_window -tools monkey droidbot -r 3 -t 60 120 180 300
+python main.py --no_window --skip_experiment -tools monkey -r 1 -t 60
 
 echo "[+] Done!"

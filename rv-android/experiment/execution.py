@@ -64,7 +64,7 @@ class ExecutionManager:
         task.start_time = time.time()
         results_dir = os.path.join(self.base_results_dir, task.apk)
         task.results_dir = results_dir
-        utils.create_folder_if_not_exists(task.results_dir)
+        utils.create_folder_if_not_exists(results_dir)
         copy_methods_file(task.apk, results_dir)
         base_name = "{0}__{1}__{2}__{3}".format(task.apk, task.repetition, task.timeout, task.tool)
         task.logcat_file = os.path.join(results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))

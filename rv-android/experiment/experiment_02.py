@@ -115,13 +115,6 @@ def run_task(task: Task, no_window: bool):
             proc.kill()
 
 
-def init_maps(apks: list[App]):
-    for apk in apks:
-        apks_map[apk.name] = apk
-    for tool in x.available_tools:
-        tools_map[tool.name] = tool
-
-
 def pre_process_apks(generate_monitors: bool, instrument: bool, static_analysis: bool, base_results_dir: str):
     logging.info("Pre-processing APKs ...")
     logging.debug(f"Generate monitors? {generate_monitors}")
@@ -133,10 +126,8 @@ def pre_process_apks(generate_monitors: bool, instrument: bool, static_analysis:
     if instrument:
         rvandroid = RvAndroid()
         rvandroid.instrument_apks(results_dir=base_results_dir)
-        extract_all_methods()
     if static_analysis:
-        # TODO
-        pass
+        extract_all_methods()
 
 
 def post_process_task(task: Task):
@@ -196,32 +187,14 @@ def extract_all_methods():
                 reach.extract_reachable_methods(app.path, methods_file)
 
 
-# def xxx(app: App, rep: int, timeout: int, tool: AbstractTool, results_dir: str, no_window: bool):
-#     logging.info("Running: APK={0}, rep={1}, timeout={2}, tool={3}".format(app.name, rep, timeout, tool.name))
-#
-#     # logcat_cmd = Command('adb', ['logcat', '-v', 'tag', '-s', 'RVSEC', 'RVSEC-COV'])
-#     #
-#     # app_results_dir = os.path.join(results_dir, app.name)
-#     # utils.create_folder_if_not_exists(app_results_dir)
-#     #
-#     # copy_methods_file(app, app_results_dir)
-#     #
-#     # base_name = "{0}__{1}__{2}__{3}".format(app.name, rep, timeout, tool.name)
-#     # logcat_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))
-#     # log_file = os.path.join(app_results_dir, "{}{}".format(base_name, EXTENSION_TRACE))
-#     #
-#     # time.sleep(5)
-#     # android = Android()
-#     # with android.create_emulator(AVD_NAME, no_window) as emulator:
-#     #     android.install_with_permissions(app)
-#     #     # android.simulate_reboot() # TODO pq? eh usado no droidxp ...
-#     #     with open(logcat_file, 'wb') as log_cat:
-#     #         proc = logcat_cmd.invoke_as_deamon(stdout=log_cat)
-#     #         tool.execute(app, timeout, log_file)
-#     #         proc.kill()
+def init_maps(apps: list[App]):
+    for apk in apps:
+        apks_map[apk.name] = apk
+    for tool in x.available_tools:
+        tools_map[tool.name] = tool
 
 
-def copy_methods_file(app, app_results_dir):
+def copy_methods_file(app: App, app_results_dir: str):
     methods_file_name = app.name + EXTENSION_METHODS
     methods_file = os.path.join(INSTRUMENTED_DIR, methods_file_name)
     if os.path.exists(methods_file):
@@ -229,8 +202,3 @@ def copy_methods_file(app, app_results_dir):
     else:
         # TODO excecao? ... nao tem como tratar a cobertura depois
         pass
-
-# def create_results_dir():
-#     results_dir = os.path.join(RESULTS_DIR, TIMESTAMP)
-#     utils.create_folder_if_not_exists(results_dir)
-#     return results_dir

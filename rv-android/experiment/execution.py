@@ -54,14 +54,16 @@ class ExecutionManager:
                 self.executed_tasks.add(task)
 
     def statistics(self) -> dict:
-        pct = (len(self.executed_tasks) * 100) / len(self.tasks)
+        pct = 0.0
+        if len(self.tasks) > 0:
+            pct = (len(self.executed_tasks) * 100) / len(self.tasks)
         data = {"tasks": len(self.tasks),
                 "completed": len(self.executed_tasks),
                 "pct": round(pct, 2)}
         return data
 
     def start_task(self, task: Task):
-        task.start_time = time.time()
+        task.start_time = datetime.now()
         results_dir = os.path.join(self.base_results_dir, task.apk)
         task.results_dir = results_dir
         utils.create_folder_if_not_exists(results_dir)
@@ -72,7 +74,7 @@ class ExecutionManager:
 
     def finish_task(self, task):
         task.executed = True
-        task.finish_time = time.time() - task.start_time
+        task.finish_time = datetime.now() - task.start_time
         self.executed_tasks.add(task)
         self.write_memory()
 

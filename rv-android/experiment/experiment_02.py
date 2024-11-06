@@ -20,6 +20,7 @@ from rvandroid import RvAndroid
 from rvsec import RVSec
 from settings import *
 from tools.tool_spec import AbstractTool
+from datetime import datetime
 
 logging = logging_api.getLogger(__name__)
 
@@ -110,7 +111,7 @@ def run_task(task: Task, no_window: bool):
         with open(task.logcat_file, "wb") as log_cat:
             proc = logcat_cmd.invoke_as_deamon(stdout=log_cat)
             tool = tools_map[task.tool]
-            task.start_time = time.time()  # update start_time (after emulator is up)
+            task.start_time = datetime.now()  # update start_time (after emulator is up)
             tool.execute(app, task.timeout, task.log_file)
             proc.kill()
 

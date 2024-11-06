@@ -173,9 +173,9 @@ def to_readable_time(duration: float):
     return time
 
 
-def datetime_to_milliseconds(date: datetime):
-    return int(round(date.timestamp() * 1000))
+def datetime_to_milliseconds(date: datetime) -> float:
+    return date.timestamp()
 
 
-def milliseconds_to_datetime(timestamp: int) -> datetime:
-    return datetime.fromtimestamp(timestamp / 1000)
+def milliseconds_to_datetime(timestamp: float) -> datetime:
+    return datetime.fromtimestamp(timestamp)

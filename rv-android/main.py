@@ -5,6 +5,7 @@ import os
 import sys
 import time
 from argparse import Namespace
+from datetime import datetime
 
 import utils
 from experiment import config as experiment_config
@@ -93,16 +94,12 @@ def get_selected_tools(args: Namespace):
 
 
 def __get_tools(names: list[str]) -> list[AbstractTool]:
-    tools = []
+    tools = set()
     for t in available_tools:
         for tool in names:
             if t == tool:
-                tools.append(available_tools[t])
-    # TODO
-    # if len(tools) == 0 and not args.skip_experiment:
-    #     print("No valid tools selected.")
-    #     exit(1)
-    return tools
+                tools.add(available_tools[t])
+    return list(tools)
 
 
 def validate_args(args: Namespace):
@@ -152,7 +149,7 @@ def run_local():
     _30_min = 3 * _10_min
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [_min]
+    experiment_config.timeouts = [30, 60]
     experiment_config.tools = __get_tools(["monkey", "ape"])
 
     experiment_config.generate_monitors = False
@@ -163,7 +160,7 @@ def run_local():
 
     experiment_config.memory_file = ""
     # base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
-    # experiment_config.memory_file = os.path.join(base_dir, "20241105102541", "execution_memory.json")
+    # experiment_config.memory_file = os.path.join(base_dir, "20241105131824", "execution_memory.json")
 
     experiment_02.execute()
 

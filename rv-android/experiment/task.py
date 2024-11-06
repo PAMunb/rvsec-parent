@@ -1,5 +1,5 @@
 from enum import Enum
-
+from datetime import datetime
 
 # class TaskStatus(Enum):
 #     NOT_EXECUTED = 1
@@ -11,7 +11,7 @@ from enum import Enum
 class Task:
     cont = 0
 
-    def __init__(self, apk: str, repetition: int, timeout: int, tool: str, executed=False, start_time=0):
+    def __init__(self, apk: str, repetition: int, timeout: int, tool: str, executed=False):#, start_time=datetime.now()):
         Task.cont += 1
         self.id = Task.cont
         self.tool = tool
@@ -19,7 +19,7 @@ class Task:
         self.repetition = repetition
         self.apk = apk
         self.executed = executed
-        self.start_time = start_time  # time.time(): Return the current time in seconds since the Epoch
+        self.start_time: datetime = datetime.now()
         self.finish_time = 0
         self.time: int = 0  # time (in seconds) it took to run
         self.result: list[dict] = []

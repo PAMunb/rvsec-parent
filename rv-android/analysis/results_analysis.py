@@ -143,7 +143,7 @@ def initialize_results(results_dir: str, memory: Memory):
                             #   as chaves são os nomes das classes e o valor é o conjunto dos métodos chamados
                             rvsec_errors, called_methods = parser.parse_logcat_file(os.path.join(apk_folder_path, file))
                             task = memory.get_task(apk, rep, timeout, tool)
-                            print(f"task={task}")
+                            # print(f"task={task}")
                             rvsec_error_msgs = set()
                             errors = []
                             for err in rvsec_errors:

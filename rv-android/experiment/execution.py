@@ -1,3 +1,4 @@
+import json
 import logging as logging_api
 import os.path
 import os.path
@@ -111,3 +112,22 @@ def copy_methods_file(apk: str, app_results_dir: str):
     methods_file = os.path.join(INSTRUMENTED_DIR, methods_file_name)
     if os.path.exists(methods_file):
         shutil.copy(methods_file, app_results_dir)
+
+def status(memory_file: str) -> str:
+    memory = Memory.read(memory_file)
+    pct = 0.0
+    total_tasks = len(memory.tasks)
+    executed_tasks = 0
+    errors = []
+    for task in memory.tasks:
+        if task.executed:
+            executed_tasks += 1
+        if task.error:
+            errors.append(f"task={task}, error={task.error}")
+    if total_tasks > 0:
+        pct = (executed_tasks * 100) / total_tasks
+    data = {"tasks": total_tasks,
+            "completed": executed_tasks,
+            "pct": round(pct, 2),
+            "errors": errors}
+    return json.dumps(data, indent=2)

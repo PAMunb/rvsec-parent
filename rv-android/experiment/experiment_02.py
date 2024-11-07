@@ -38,8 +38,13 @@ def _execute(repetitions: int, timeouts: list[int], tools: list[AbstractTool], m
              instrument=True, static_analysis=True, skip_experiment=False, no_window=False):
     logging.info("Executing Experiment ...")
 
-    # generate monitors, instrument APKs and run static analysis
-    pre_process_apks(generate_monitors, instrument, static_analysis, INSTRUMENTED_DIR)
+    # memory_file indicates whether to
+    #  - resume the experiment run (based on file content), OR
+    #  - start a new run (blank value)
+    # If you are going to continue an execution, it is not necessary to pre-process the apks again ...
+    if not memory_file:
+        # generate monitors, instrument APKs and run static analysis
+        pre_process_apks(generate_monitors, instrument, static_analysis, INSTRUMENTED_DIR)
 
     if not skip_experiment:
         # run experiment
@@ -72,13 +77,14 @@ def run_experiment(repetitions: int, timeouts: list[int], tools: list[AbstractTo
             run(task, exec_manager, no_window)
     logging.info(f"Execution memory file: {exec_manager.memory_file}")
 
-    # TODO verify_execution
-    # logging.info(f"Verifying execution status: {exec_manager.statistics()}")
-    # status = exec_manager.statistics()
-    # if status["pct"] < 100:
-    #     for task in exec_manager.tasks:
-    #         if not task.executed:
-    #             run(task, exec_manager, no_window)
+    logging.info(f"Verifying execution status: {exec_manager.statistics()}")
+    for _ in range(3):  # 3 retries
+        status = exec_manager.statistics()
+        if status["pct"] == 100:
+            break
+        for task in exec_manager.tasks:
+            if not task.executed:
+                run(task, exec_manager, no_window)
 
     return exec_manager
 

@@ -1,17 +1,15 @@
 from enum import Enum
 from datetime import datetime
+import utils
 
-# class TaskStatus(Enum):
-#     NOT_EXECUTED = 1
-#     EXECUTING = 2
-#     EXECUTED = 3
-#     ERROR = 4
+
+DEFAULT_DATETIME = utils.milliseconds_to_datetime(0)
 
 
 class Task:
     cont = 0
 
-    def __init__(self, apk: str, repetition: int, timeout: int, tool: str, executed=False):#, start_time=datetime.now()):
+    def __init__(self, apk: str, repetition: int, timeout: int, tool: str, executed=False, start_time=DEFAULT_DATETIME):
         Task.cont += 1
         self.id = Task.cont
         self.tool = tool
@@ -19,8 +17,8 @@ class Task:
         self.repetition = repetition
         self.apk = apk
         self.executed = executed
-        self.start_time: datetime = datetime.now()
-        self.finish_time = 0
+        self.start_time: datetime = start_time
+        self.finish_time = 0  # TODO used?
         self.time: int = 0  # time (in seconds) it took to run
         self.result: list[dict] = []
         self.coverage = {}
@@ -30,8 +28,7 @@ class Task:
         self.log_file = ""
 
     def __str__(self):
-        return "[id={}, apk={}, rep={}, timeout={}, tool={}]".format(self.id, self.apk, self.repetition, self.timeout,
-                                                                     self.tool)
+        return "[id={}, apk={}, rep={}, timeout={}, tool={}]".format(self.id, self.apk, self.repetition, self.timeout, self.tool)
 
     def __repr__(self):
         return "[{},{},{},{},{},{}]".format(self.id, self.apk, self.repetition, self.timeout, self.tool, self.executed)

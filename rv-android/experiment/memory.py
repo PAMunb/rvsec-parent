@@ -58,8 +58,6 @@ class Memory:
         with open(memory_file, "r") as file:
             result = json.load(file)
             memory.tasks, memory.tasks_map = memory.__from_result(result)
-            print(f"memory.tasks_map={memory.tasks_map}")
-            print(f"memory.tasks={memory.tasks}")
         return memory
 
     def write(self, memory_file: str):
@@ -68,10 +66,8 @@ class Memory:
             json.dump(result, outfile)
 
     def __to_result(self):
-        print("************** __to_result")
         result = {}
         for task in self.tasks:
-            print(f"\t - task={task}, start_time={task.start_time}, type={type(task.start_time)}")
             start_time = utils.datetime_to_milliseconds(task.start_time)
             result.setdefault(task.apk, {}).setdefault(task.repetition, {}).setdefault(task.timeout, {})[
                 task.tool] = {"executed": task.executed,
@@ -84,7 +80,6 @@ class Memory:
 
     @staticmethod
     def __from_result(result):
-        print("************* __from_result ....")
         tasks = []
         mapa = {}
         for apk, rep_data in result.items():
@@ -98,19 +93,10 @@ class Memory:
                         mapa[apk][rep][timeout] = {}
                     for tool, data in tool_data.items():
                         task = Task(apk, int(rep), int(timeout), tool)
-                        print(f"\t - task={task}")
                         task.executed = data["executed"]
-                        # TODO vem str, int ou datetime? ... >>> float
-                        # time.time()
-                        print(f"\t\t - data[\"start_time\"]={data["start_time"]}, type={type(data["start_time"])}")
-                        date = datetime.fromtimestamp(data["start_time"])
-                        print(f"\t\t - date={date}")
-                        task.start_time = date
-                        # task.start_time = utils.datetime_to_milliseconds(date)
-                        print(f"\t\t - data[\"start_time\"]={data["start_time"]}, date={date}, date_type={type(date)}, milis={utils.datetime_to_milliseconds(date)}")
+                        task.start_time = datetime.fromtimestamp(data["start_time"])
                         task.error = data["error"]
                         mapa[apk][rep][timeout][tool] = task
-                        print(f"mapa[{apk}][{rep}][{timeout}][{tool}] = {task}")
                         tasks.append(task)
         return tasks, mapa
 

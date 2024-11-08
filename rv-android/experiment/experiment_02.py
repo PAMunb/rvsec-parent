@@ -66,7 +66,7 @@ def run_experiment(repetitions: int, timeouts: list[int], tools: list[AbstractTo
     # initialize execution memory
     exec_manager = ExecutionManager()
     exec_order = lambda x: (x.repetition, x.timeout, x.tool, x.apk)
-    # exec_order = lambda x: (x.repetition, x.apk, x.timeout, x.tool)
+    # exec_order = lambda x: (x.apk, x.repetition, x.timeout, x.tool)
     exec_manager.create_memory(apks, repetitions, timeouts, tools, memory_file, exec_order)
 
     # execute tasks

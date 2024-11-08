@@ -1,5 +1,6 @@
 import argparse
 import importlib
+import json
 import logging
 import os
 import sys
@@ -28,7 +29,6 @@ $ python main.py --list-tools
 def run_cli():
     parser = create_argument_parser()
     args: Namespace = parser.parse_args()
-    validate_args(args)
 
     # Logging configuration
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if args.debug else logging.INFO)
@@ -49,6 +49,9 @@ def run_cli():
     experiment_config.static_analysis = not args.skip_static_analysis
     experiment_config.no_window = args.no_window
     experiment_config.skip_experiment = args.skip_experiment
+
+    validate_experiment_config()
+    print_experiment_config()
 
     logging.info('############# STARTING EXPERIMENT #############')
     start = time.time()
@@ -79,18 +82,12 @@ def load_tools():
     experiment_config.available_tools = available_tools.values()
 
 
-def qualified_name(p):
-    return p.replace(".py", "").replace("./", "").replace("/", ".")
-
-
-def check_positive(value: int):
-    if value <= 0:
-        print("The value must be greater than zero: {}".format(value))
-        exit(1)
-
-
 def get_selected_tools(args: Namespace):
-    return __get_tools(args.tools)
+    selected_tools = __get_tools(args.tools)
+    if len(selected_tools) == 0 and not args.skip_experiment:
+        print("No valid tools selected.")
+        exit(1)
+    return selected_tools
 
 
 def __get_tools(names: list[str]) -> list[AbstractTool]:
@@ -102,12 +99,14 @@ def __get_tools(names: list[str]) -> list[AbstractTool]:
     return list(tools)
 
 
-def validate_args(args: Namespace):
-    # Validate arguments
-    check_positive(args.r)
-    for i in args.t:
-        check_positive(i)
+def qualified_name(p):
+    return p.replace(".py", "").replace("./", "").replace("/", ".")
 
+
+# def check_positive(value: int):
+#     if value <= 0:
+#         print("The value must be greater than zero: {}".format(value))
+#         exit(1)
 
 def create_argument_parser():
     # Start catching arguments
@@ -115,15 +114,12 @@ def create_argument_parser():
     # list available tools
     parser.add_argument("--list-tools", help="list available tools", action="store_true")
     # List of test tools to be used in the experiment
-    parser.add_argument('-tools', nargs='+', default=['monkey'],
-                        help="List of test tools to be used in the experiment. EX: -tools monkey droidbot")
+    parser.add_argument('-tools', nargs='+', default=['monkey'],  help="List of test tools to be used in the experiment. Default: [monkey]. EX: -tools monkey droidbot")
     # List of the execution timeouts in the experiment
-    parser.add_argument('-t', nargs='+', default=[60],
-                        help='List of the execution timeouts (in seconds) in the experiment. EX: -t 120 300', type=int)
+    parser.add_argument('-t', nargs='+', default=[60], help='List of the execution timeouts (in seconds) in the experiment. Default: [60]. EX: -t 120 300', type=int)
     # Number of repetitions used in the experiment
-    parser.add_argument('-r', default=1, help='Number of repetitions used in the experiment. EX: -r 10',
-                        type=int)
-    parser.add_argument('-c', default=1, help='Path of the execution memory file', type=str)
+    parser.add_argument('-r', default=1, help='Number of repetitions used in the experiment. Default: 1. EX: -r 3', type=int, required=False)
+    parser.add_argument('-c', default="", help='Path of the execution memory file (to continue an execution)', type=str)
     parser.add_argument("--no_window", help="Starts emulator with '-no-window'", action="store_true")
     # Enable DEBUG mode.
     parser.add_argument('--debug', help='Run in DEBUG mode (default: false)', dest='debug', action='store_true')
@@ -131,7 +127,79 @@ def create_argument_parser():
     parser.add_argument("--skip_instrument", help="Skip instrumentation", action="store_true")
     parser.add_argument("--skip_experiment", help="Skip experiment execution", action="store_true")
     parser.add_argument("--skip_static_analysis", help="Skip static analysis", action="store_true")
+
+    # parser.add_argument('-h', help='Show help message', action="store_true")
+
     return parser
+
+
+def validate_experiment_config():
+    # print(f"experiment_config.repetitions={experiment_config.repetitions}")
+    # print(f"experiment_config.timeouts={experiment_config.timeouts}")
+    # print(f"experiment_config.tools={len(experiment_config.tools)}")
+    # print(f"experiment_config.generate_monitors={experiment_config.generate_monitors}")
+    # print(f"experiment_config.instrument={experiment_config.instrument}")
+    # print(f"experiment_config.static_analysis={experiment_config.static_analysis}")
+    # print(f"experiment_config.skip_experiment={experiment_config.skip_experiment}")
+    # print(f"experiment_config.memory_file={experiment_config.memory_file}")
+    # print(f"experiment_config.no_window={experiment_config.no_window}")
+    errors = []
+    if experiment_config.memory_file:
+        if not os.path.isfile(experiment_config.memory_file):
+            errors.append(f"Invalid execution memory file: {experiment_config.memory_file}")
+    elif not experiment_config.skip_experiment:
+        __validate_repetitions(errors)
+        __validate_timeouts(errors)
+        __validate_tools(errors)
+    if errors:
+        print("Errors in experiment configuration:")
+        for error in errors:
+            print(error)
+        exit(1)
+
+
+def print_experiment_config():
+    tools_names = []
+    for tool in experiment_config.tools:
+        tools_names.append(tool.name)
+
+    config_str = (
+        f"Original/Partial experiment config:\n"
+        f"  - repetitions={experiment_config.repetitions}\n"
+        f"  - timeouts={experiment_config.timeouts}\n"
+        f"  - tools={tools_names}\n"
+        f"  - pre-process=[generate_monitors={experiment_config.generate_monitors}, instrument={experiment_config.instrument}, static_analysis={experiment_config.static_analysis}]\n"
+        f"  - skip_experiment={experiment_config.skip_experiment}\n"
+        f"  - memory_file={experiment_config.memory_file}\n"
+        f"  - no_window={experiment_config.no_window}"
+    )
+
+    logging.info(config_str)
+
+
+def __validate_repetitions(errors):
+    if experiment_config.repetitions <= 0:
+        errors.append(f"Invalid 'repetitions': {experiment_config.repetitions}")
+
+
+def __validate_tools(errors):
+    if len(experiment_config.available_tools) == 0:
+        errors.append("No available tools")
+    elif len(experiment_config.tools) == 0:
+        errors.append("Invalid 'tools': 0")
+
+
+def __validate_timeouts(errors):
+    visited = []
+    if len(experiment_config.timeouts) == 0:
+        errors.append(f"Invalid 'timeouts': {experiment_config.timeouts}")
+    else:
+        for timeout in experiment_config.timeouts:
+            if timeout <= 0:
+                errors.append(f"Invalid 'timeout': {timeout}")
+            elif timeout in visited:
+                errors.append(f"Duplicated timeout: {timeout}")
+            visited.append(timeout)
 
 
 def run_local():
@@ -149,11 +217,12 @@ def run_local():
     _30_min = 3 * _10_min
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [180]
-    experiment_config.tools = __get_tools(["monkey", "droidbot", "ape", "fastbot", "humanoid"])
+    experiment_config.timeouts = [_min, _10_min]
+    experiment_config.tools = __get_tools(["monkey", "droidbot"])
     # testados: monkey, ape, fastbot, droidmate
     # "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid"
     # ares
+    # PROBLEMA qtesting
 
     experiment_config.generate_monitors = True
     experiment_config.instrument = True
@@ -161,9 +230,12 @@ def run_local():
     experiment_config.no_window = True
     experiment_config.skip_experiment = False
 
-    # experiment_config.memory_file = ""
-    base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
-    experiment_config.memory_file = os.path.join(base_dir, "20241106124331", "execution_memory.json")
+    experiment_config.memory_file = ""
+    # base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
+    # experiment_config.memory_file = os.path.join(base_dir, "20241106124331", "execution_memory.json")
+
+    validate_experiment_config()
+    print_experiment_config()
 
     experiment_02.execute()
 

@@ -88,7 +88,7 @@ class ExecutionManager:
         return Memory.read(self.memory_file)
 
     def write_memory(self):
-        logging.debug("Writing execution memory file: {}".format(self.memory_file))
+        logging.info("Writing execution memory file: {}".format(self.memory_file))
         self.memory.write(self.memory_file)
 
     @staticmethod

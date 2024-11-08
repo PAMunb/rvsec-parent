@@ -17,7 +17,7 @@ class Task:
         self.repetition = repetition
         self.apk = apk
         self.executed = executed
-        self.start_time: datetime = start_time
+        self.start_time: datetime = start_time # TODO inicializar com None
         self.finish_time = 0  # TODO used?
         self.time: int = 0  # time (in seconds) it took to run
         self.result: list[dict] = []

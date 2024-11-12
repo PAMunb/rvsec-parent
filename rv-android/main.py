@@ -213,21 +213,25 @@ def run_local():
     #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
 
     _min = 60
-    _10_min = 10 * _min
+    _5_min = 5 * _min
+    _10_min = 2 * _5_min
     _30_min = 3 * _10_min
+    _1_hour = 60 * _min
+    _3_hour = 3 * _1_hour
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [_min, _10_min]
-    experiment_config.tools = __get_tools(["monkey", "droidbot"])
+    experiment_config.timeouts = [_min]
+    experiment_config.tools = __get_tools(["qtesting"])
+    # "ape", "fastbot", "droidbot_dfs_greedy", "ares",
     # testados: monkey, ape, fastbot, droidmate
     # "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid"
     # ares
     # PROBLEMA qtesting
 
-    experiment_config.generate_monitors = True
-    experiment_config.instrument = True
-    experiment_config.static_analysis = True
-    experiment_config.no_window = True
+    experiment_config.generate_monitors = False
+    experiment_config.instrument = False
+    experiment_config.static_analysis = False
+    experiment_config.no_window = False
     experiment_config.skip_experiment = False
 
     experiment_config.memory_file = ""

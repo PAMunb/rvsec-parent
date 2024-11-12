@@ -26,9 +26,11 @@ class ToolSpec(AbstractTool):
                                     (http://gutianxiao.com/ape/).""",
                                        'com.android.commands.ape')
 
-    def execute_tool_specific_logic(self, app: App, timeout: int, log_file: str):
+    def execute_tool_specific_logic(self, app: App, timeout_in_seconds: int, log_file: str):
         ape_base_dir = os.path.join(WORKING_DIR, 'tools', 'ape')
         jar_ape = os.path.join(ape_base_dir, 'ape.jar')
+
+        timeout_in_minutes = int(timeout_in_seconds / 60)
 
         with open(log_file, 'wb') as trace:
             adb_push(jar_ape, "/data/local/tmp/ape.jar", trace)
@@ -44,9 +46,9 @@ class ToolSpec(AbstractTool):
                 '-p',
                 app.package_name,
                 '--running-minutes',
-                '100',
+                str(timeout_in_minutes),
                 '--ape',
                 'sata'
-            ], timeout)
+            ], timeout_in_seconds)
             exec_cmd.invoke(stdout=trace)
 

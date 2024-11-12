@@ -18,8 +18,7 @@ class ToolSpec(AbstractTool):
         learning techniques to assist discovery in a more intelligent way. (https://github.com/bytedance/Fastbot_Android).""",
                                        'com.android.commands.fastbot')
 
-    def execute_tool_specific_logic(self, app: App, timeout: int, log_file: str):
-        print(">>>>>>>>>>> {}".format(os.getcwd()))
+    def execute_tool_specific_logic(self, app: App, timeout_in_seconds: int, log_file: str):
         fastbot_base_dir = os.path.join(WORKING_DIR, 'tools', 'fastbot')
 
         jar_monkeyq = os.path.join(fastbot_base_dir, 'monkeyq.jar')
@@ -43,6 +42,8 @@ class ToolSpec(AbstractTool):
         adb_push(apk_string, "/sdcard")
         os.remove(apk_string)
 
+        timeout_in_minutes = int(timeout_in_seconds / 60)
+
         with open(log_file, 'wb') as trace:
             exec_cmd = Command('adb', [
                 '-s',
@@ -58,10 +59,10 @@ class ToolSpec(AbstractTool):
                 '--agent',
                 'reuseq',
                 '--running-minutes',
-                '120',  # TODO
+                str(timeout_in_minutes),
                 '--throttle',
                 '100',  # TODO
                 '-v',
                 '-v'
-            ], timeout)
+            ], timeout_in_seconds)
             exec_cmd.invoke(stdout=trace)

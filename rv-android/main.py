@@ -15,7 +15,7 @@ from tools.tool_spec import AbstractTool
 
 available_tools: dict[str, AbstractTool] = {}
 
-program_description = f'''
+program_description = '''
 Executes the 'Experiment 02' ... 
 
 Examples:    
@@ -103,11 +103,6 @@ def qualified_name(p):
     return p.replace(".py", "").replace("./", "").replace("/", ".")
 
 
-# def check_positive(value: int):
-#     if value <= 0:
-#         print("The value must be greater than zero: {}".format(value))
-#         exit(1)
-
 def create_argument_parser():
     # Start catching arguments
     parser = argparse.ArgumentParser(description=program_description, formatter_class=argparse.RawTextHelpFormatter)
@@ -134,15 +129,6 @@ def create_argument_parser():
 
 
 def validate_experiment_config():
-    # print(f"experiment_config.repetitions={experiment_config.repetitions}")
-    # print(f"experiment_config.timeouts={experiment_config.timeouts}")
-    # print(f"experiment_config.tools={len(experiment_config.tools)}")
-    # print(f"experiment_config.generate_monitors={experiment_config.generate_monitors}")
-    # print(f"experiment_config.instrument={experiment_config.instrument}")
-    # print(f"experiment_config.static_analysis={experiment_config.static_analysis}")
-    # print(f"experiment_config.skip_experiment={experiment_config.skip_experiment}")
-    # print(f"experiment_config.memory_file={experiment_config.memory_file}")
-    # print(f"experiment_config.no_window={experiment_config.no_window}")
     errors = []
     if experiment_config.memory_file:
         if not os.path.isfile(experiment_config.memory_file):
@@ -213,6 +199,7 @@ def run_local():
     #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
 
     _min = 60
+    _3_min = 3 * _min
     _5_min = 5 * _min
     _10_min = 2 * _5_min
     _30_min = 3 * _10_min
@@ -220,23 +207,21 @@ def run_local():
     _3_hour = 3 * _1_hour
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [_min]
-    experiment_config.tools = __get_tools(["qtesting"])
-    # "ape", "fastbot", "droidbot_dfs_greedy", "ares",
+    experiment_config.timeouts = [_5_min]
+    experiment_config.tools = __get_tools(["ares", "qtesting"])
+    # "ape", "fastbot", "droidbot_dfs_greedy", "ares", "qtesting"
     # testados: monkey, ape, fastbot, droidmate
     # "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid"
-    # ares
-    # PROBLEMA qtesting
 
-    experiment_config.generate_monitors = False
-    experiment_config.instrument = False
-    experiment_config.static_analysis = False
+    experiment_config.generate_monitors = True
+    experiment_config.instrument = True
+    experiment_config.static_analysis = True
     experiment_config.no_window = False
     experiment_config.skip_experiment = False
 
-    experiment_config.memory_file = ""
-    # base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
-    # experiment_config.memory_file = os.path.join(base_dir, "20241106124331", "execution_memory.json")
+    # experiment_config.memory_file = ""
+    base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results"
+    experiment_config.memory_file = os.path.join(base_dir, "20241112134842", "execution_memory.json")
 
     validate_experiment_config()
     print_experiment_config()
@@ -249,5 +234,5 @@ def run_local():
 if __name__ == '__main__':
     load_tools()
 
-    # run_cli()
-    run_local()
+    run_cli()
+    # run_local()

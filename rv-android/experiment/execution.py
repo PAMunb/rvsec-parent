@@ -75,12 +75,13 @@ class ExecutionManager:
 
     def finish_task(self, task):
         task.executed = True
-        task.finish_time = datetime.now() - task.start_time
+        task.finish_time = datetime.now()
         self.executed_tasks.add(task)
         self.write_memory()
 
     def task_error(self, task, ex):
         task.error = str(ex)
+        task.finish_time = datetime.now()
         self.write_memory()
 
     def read_memory(self) -> Memory:

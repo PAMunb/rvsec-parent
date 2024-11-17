@@ -72,11 +72,11 @@ class Memory:
             finish_time = utils.datetime_to_milliseconds(task.finish_time)
             result.setdefault(task.apk, {}).setdefault(task.repetition, {}).setdefault(task.timeout, {})[
                 task.tool] = {"executed": task.executed,
-                              "start_time": start_time,
-                              "finish_time": finish_time,
+                              "start": start_time,
+                              "finish": finish_time
                               # "result": task.result,
                               # "coverage": task.coverage,
-                              "error": str(task.error)
+                              # "error": str(task.error)
                               }
         return result
 
@@ -96,9 +96,9 @@ class Memory:
                     for tool, data in tool_data.items():
                         task = Task(apk, int(rep), int(timeout), tool)
                         task.executed = data["executed"]
-                        task.start_time = datetime.fromtimestamp(data["start_time"])
-                        task.finish_time = datetime.fromtimestamp(data["finish_time"])
-                        task.error = data["error"]
+                        task.start_time = datetime.fromtimestamp(data["start"])
+                        task.finish_time = datetime.fromtimestamp(data["finish"])
+                        # task.error = data["error"]
                         mapa[apk][rep][timeout][tool] = task
                         tasks.append(task)
         return tasks, mapa

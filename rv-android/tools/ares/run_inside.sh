@@ -14,7 +14,7 @@ venv/bin/python3 rl_interaction/parallel_exec.py \
     --algo SAC \
     --iterations 1 \
     --path "apks" \
-    --timesteps 9999 \
+    --timesteps 1000000 \
     --trials_per_app 1 \
     --real_device \
     --udid "$EMUNAME" \

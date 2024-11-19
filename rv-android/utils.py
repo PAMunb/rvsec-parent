@@ -177,5 +177,9 @@ def datetime_to_milliseconds(date: datetime) -> float:
     return date.timestamp()
 
 
+def datetime_to_string(date: datetime) -> str:
+    return date.strftime("%d/%b/%Y %H:%M:%S.%f")
+
+
 def milliseconds_to_datetime(timestamp: float) -> datetime:
     return datetime.fromtimestamp(timestamp)

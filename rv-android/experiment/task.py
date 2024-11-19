@@ -22,7 +22,7 @@ class Task:
         self.time: int = 0  # time (in seconds) it took to run
         self.result: list[dict] = []
         self.coverage = {}
-        self.error = {}
+        self.error = ""
         self.results_dir = ""
         self.logcat_file = ""
         self.log_file = ""

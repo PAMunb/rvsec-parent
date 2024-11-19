@@ -100,7 +100,6 @@ def run(task, exec_manager, no_window):
         exec_manager.task_error(task, ex)
         error_msg = f"Error while running task: {task}. {ex}"
         logging.error(error_msg)
-        print(ex)
 
 
 def run_task(task: Task, no_window: bool):

@@ -12,17 +12,22 @@ class ToolSpec(AbstractTool):
         super(ToolSpec, self).__init__("droidbot", """DroidBot is a lightweight test input generator for Android. 
         It can send random or scripted input events to an Android app, achieve higher test coverage more quickly, 
         and generate a UI transition graph (UTG) after testing (https://github.com/honeynet/droidbot).""",
-                                       'com.android.commands.droidbot')
+                                       "com.android.commands.droidbot")
 
     def execute_tool_specific_logic(self, app: App, timeout: int, log_file: str):
-        with open(log_file, 'wb') as trace:
-            exec_cmd = Command('droidbot', [
-                '-d',
-                'emulator-5554',
-                '-a',
+        with open(log_file, "wb") as trace:
+            exec_cmd = Command("droidbot", [
+                "-d",
+                "emulator-5554",
+                "-a",
                 app.path,
-                '-policy',
-                'dfs_naive',
-                '-is_emulator',
+                "-policy",
+                "dfs_naive",
+                "-count",
+                "10000000000",
+                "-timeout",
+                str(timeout),
+                "-ignore_ad",
+                "-is_emulator",
             ], timeout)
             exec_cmd.invoke(stdout=trace)

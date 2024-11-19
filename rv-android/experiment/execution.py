@@ -114,6 +114,7 @@ def copy_methods_file(apk: str, app_results_dir: str):
     if os.path.exists(methods_file):
         shutil.copy(methods_file, app_results_dir)
 
+
 def status(memory_file: str) -> str:
     memory = Memory.read(memory_file)
     pct = 0.0

@@ -11,6 +11,6 @@ QTESTING_DIR=$2
 #echo $TIMEOUT
 #echo $QTESTING_DIR
 
-cp -f $APPNAME $QTESTING_DIR/apks/app.apk
-docker run -v $QTESTING_DIR/apks:/qtesting/apks --net=host -i --rm phtcosta/qtesting:0.0.1
-       #python src/main.py -r apks/conf.txt
+#cp -f $APPNAME $QTESTING_DIR/apks/app.apk
+#docker run -v $QTESTING_DIR/apks:/qtesting/apks --net=host -i --rm phtcosta/qtesting:0.0.1
+python src/main.py -r src/conf.txt

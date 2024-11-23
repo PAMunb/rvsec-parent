@@ -11,7 +11,8 @@ class ToolSpec(AbstractTool):
         super(ToolSpec, self).__init__("ares", """ ares """, 'run_ares.sh')
 
     def execute_tool_specific_logic(self, app: App, timeout_in_seconds: int, log_file: str):
-        ares_entrypoint = os.path.join(WORKING_DIR, 'tools', 'ares', 'run_ares.sh')
+        ares_dir = os.path.join(WORKING_DIR, 'tools', 'ares')
+        ares_entrypoint = os.path.join(ares_dir, 'run_ares.sh')
 
         timeout_in_minutes = int(timeout_in_seconds/60)
 
@@ -20,6 +21,6 @@ class ToolSpec(AbstractTool):
                 app.path,
                 'emulator-5554',
                 str(timeout_in_minutes),
-                "{}".format(os.path.join(WORKING_DIR, 'tools', 'ares'))
+                "{}".format(ares_dir)
             ], timeout_in_seconds)
             exec_cmd.invoke(stdout=ares_trace)

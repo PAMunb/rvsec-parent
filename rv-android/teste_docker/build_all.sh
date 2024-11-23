@@ -1,8 +1,6 @@
 #!/bin/bash
 
-./sdkman/build.sh
-
-./aspectj/build.sh
+./base/build.sh
 
 ./android/build.sh
 

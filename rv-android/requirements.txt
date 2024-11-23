@@ -2,6 +2,4 @@ androguard==3.4.0a1
 networkx
 requests
 call-function-with-timeout
-tensorflow==2.16.1
-packaging==24.1
-uiautomator==0.3.6
+psutil

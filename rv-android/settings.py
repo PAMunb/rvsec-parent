@@ -1,5 +1,6 @@
 import os
 import time
+from pathlib import Path
 
 TIMESTAMP = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
@@ -7,9 +8,9 @@ START = time.time()
 
 WORKING_DIR = os.getcwd()
 
-# APKS_DIR = os.path.join(WORKING_DIR, 'apks')
-# APKS_DIR = os.path.join(WORKING_DIR, 'apks_tmp')
-APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', '01')
+APKS_DIR = os.path.join(WORKING_DIR, 'apks')
+#APKS_DIR = os.path.join(WORKING_DIR, 'apks_tmp')
+# APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', '02')
 RESULTS_DIR = os.path.join(WORKING_DIR, 'results')
 # INSTRUMENTED_DIR = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_experiment02/instrumented"
 INSTRUMENTED_DIR = os.path.join(WORKING_DIR, 'out')
@@ -50,5 +51,4 @@ ANDROID_JAR_PATH = os.path.join(ANDROID_PLATFORM_LIB, 'android.jar')
 KEYSTORE_FILE = os.path.join(WORKING_DIR, 'keystore.jks')
 KEYSTORE_PASSWORD = 'password'
 
-from pathlib import Path
 RT_JAR = os.path.join(Path.home(), '.sdkman', 'candidates', 'java', '8.0.302-open', 'jre', 'lib', 'rt.jar')

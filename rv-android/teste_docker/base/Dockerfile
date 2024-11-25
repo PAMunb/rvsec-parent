@@ -7,9 +7,10 @@ SHELL ["/bin/bash", "-c"]
 ENV ASPECTJ_HOME=/opt/aspectj
 ENV PATH=$ASPECTJ_HOME/bin:/usr/local/bin:/usr/bin:/bin:$PATH
 
-# Install basic packages (including: java and python)
+# Install basic packages (including: java, python and maven)
 RUN apt-get update && \
-    apt install -qq -y --no-install-recommends curl wget zip unzip git nano software-properties-common openjdk-11-jdk maven npm psmisc python2 ruby2.7 gnuplot && \
+    apt install -qq -y --no-install-recommends curl wget zip unzip git nano software-properties-common openjdk-11-jdk \
+    maven npm psmisc python2 ruby2.7 gnuplot procps && \
     curl  https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2 && \
     pip2 install virtualenv && \
     apt autoremove -y && \

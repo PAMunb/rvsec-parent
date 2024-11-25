@@ -19,7 +19,7 @@ cp -f $APPNAME $ARES_DIR/apks/app.apk
 #docker run -v $ARES_DIR/apks:/ares/apks -e TIMEOUT_IN_MINUTES=$TIMEOUT -e EMUNAME=$EMUNAME --net=host -i --rm phtcosta/ares:0.0.2 #\
 cd $ARES_DIR
 export PYTHONPATH=$ARES_DIR
-python rl_interaction/parallel_exec.py \
+venv/bin/python rl_interaction/parallel_exec.py \
     --list_devices . \
     --appium_ports 4270 \
     --android_ports 0 \

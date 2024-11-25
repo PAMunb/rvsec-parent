@@ -18,28 +18,28 @@ logging = logging_api.getLogger(__name__)
 
 
 def kill_process_tree(pid):
-    print(f"kill_process_tree={pid}")
+    # print(f"kill_process_tree={pid}")
     parent = psutil.Process(pid)
-    print(f"parent={parent}")
+    # print(f"parent={parent}")
     for child in parent.children(recursive=True):
         # child.kill()
-        print(f">>> Matando processo filho: {child.pid}")
+        # print(f">>> Matando processo filho: {child.pid}")
         os.kill(child.pid, signal.SIGKILL)
-    print(f">>> Matando processo  {parent.pid}")
+    # print(f">>> Matando processo  {parent.pid}")
     # parent.kill()
     # os.kill(parent.pid, signal.SIGINT)
     # os.kill(parent.pid, signal.SIGTERM)
     # print("mandou SIGINT")
     os.kill(parent.pid, signal.SIGKILL)
     # parent.kill()
-    print("mandou SIGKILL")
-    cont = 0
-    while cont < 5 and parent.is_running():
-        print(f"cont={cont}")
-        os.kill(parent.pid, signal.SIGKILL)
-        os.kill(parent.pid, signal.SIGINT)
-        cont += 1
-    print(f"nao matou? {parent.is_running()}")
+    # print("mandou SIGKILL")
+    # cont = 0
+    # while cont < 5 and parent.is_running():
+    #     print(f"cont={cont}")
+    #     os.kill(parent.pid, signal.SIGKILL)
+    #     os.kill(parent.pid, signal.SIGINT)
+    #     cont += 1
+    # print(f"nao matou? {parent.is_running()}")
     # if parent.parent():
     #     print("possui parent ...")
     #     kill_process_tree(parent.parent().pid)

@@ -11,6 +11,7 @@ class ToolSpec(AbstractTool):
 
     def execute_tool_specific_logic(self, app: App, timeout_in_seconds: int, log_file: str):
         qtesting_dir = os.path.join(WORKING_DIR, "tools", "qtesting")
+        qtesting_python = os.path.join(qtesting_dir, "venv", "bin", "python")
         qtesting_entrypoint = os.path.join(qtesting_dir, "src", "main.py")
         # qtesting_dir = os.path.join(WORKING_DIR, "tools", "qtesting")
         # qtesting_entrypoint = os.path.join(qtesting_dir, "run.sh")
@@ -35,14 +36,21 @@ class ToolSpec(AbstractTool):
             #         TEST_INDEX=1""".format(timeout_in_seconds))
 
         with open(log_file, "wb") as qtesting_trace:
+
+            # exec_cmd = Command(qtesting_entrypoint, [
+            #     "{}".format(qtesting_dir)
+            # ], timeout_in_seconds)
+
             exec_cmd = Command("python", [
                 "{}".format(qtesting_entrypoint),
                 "-r",
                 "{0}".format(config_file)
             ])
             # ], timeout_in_seconds)
+
             # exec_cmd = Command("{}".format(qtesting_entrypoint), [
             #     app.path,
             #     qtesting_dir
             # ], timeout_in_seconds)
+
             exec_cmd.invoke(stdout=qtesting_trace)

@@ -18,18 +18,24 @@ RUN cd /opt && \
     mvn clean install -DskipTests -DskipMopAgent && \
     cd /opt/rvsec/rv-android && \
     mvn clean compile && \
-    python3 -m venv venv && \
-    source venv/bin/activate && \
-    pip install -r requirements.txt && \
-    cd tools/qtesting/src && \
-    pip install -r requirements.txt
+    python -m venv venv && \
+    . venv/bin/activate && \
+    pip3 install -r requirements.txt && \
+    cd /opt/rvsec/rv-android/tools/qtesting && \
+    pip3 install -r src/requirements.txt
 
+#RUN cd /opt/rvsec/rv-android/tools/qtesting && \
+#    python -m venv venv && \
+#    source venv/bin/activate && \
+#    pip install -r src/requirements.txt
+
+ENV PYTHONPATH=/opt/rvsec/rv-android/tools/ares
 RUN npm install -g appium@1.22.3 && \
     cd /tmp && git clone https://github.com/H2SO4T/ARES && \
     cp -Rf /tmp/ARES/* /opt/rvsec/rv-android/tools/ares && \
     cd /opt/rvsec/rv-android/tools/ares && \
-#    python3 -m venv venv && \
-#    . venv/bin/activate && \
+    python -m venv venv && \
+    . venv/bin/activate && \
     pip install -v --timeout=5000 -r rl_interaction/requirements.txt
 
 #RUN cd /opt/rvsec/rv-android/tools/humanoid && \

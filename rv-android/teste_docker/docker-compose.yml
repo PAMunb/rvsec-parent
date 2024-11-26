@@ -1,21 +1,55 @@
 version: '3.7'
 services:
-   rv01:
-     image: phtcosta/rvandroid:0.0.1
-     container_name: rv01
-     environment:
-     - HUMANOID_URL=humanoid:50405
-     devices:
-     - /dev/kvm:/dev/kvm
-#     depends_on:
-#     - humanoid
 #   humanoid:
 #     image: phtcosta/humanoid:1.0
 #     container_name: humanoid
 #     ports:
 #     - 50405:50405
 #     healthcheck:
-#       test: [ "CMD", "curl", "-f", "http://localhost:50405" ]
+#       test: [ "CMD", "curl", "-f", "http://127.0.0.1:50405" ]
 #       interval: 5s
 #       timeout: 3s
 #       retries: 5
+   rv01:
+     image: phtcosta/rvandroid:0.0.1
+     container_name: rv01
+     environment:
+       - RV_REPETITIONS=1
+       - RV_TIMEOUTS=60
+       - RV_TOOLS=ape monkey
+       - RV_HUMANOID_URL=humanoid:50405
+       - ENV_NO_WINDOW=true
+     volumes:
+       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/apks/tmp:/opt/rvsec/rv-android/apks
+       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/instrumented:/opt/rvsec/rv-android/out
+       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/results:/opt/rvsec/rv-android/results
+     devices:
+       - /dev/kvm:/dev/kvm
+#     depends_on:
+#       - humanoid
+#   rv_example:
+#     image: phtcosta/rvandroid:0.0.1
+#     container_name: rv_example
+#     environment:
+#       - RV_REPETITIONS=1
+#       - RV_TIMEOUTS="60"
+#       - RV_TOOLS="ape ares droidbot droidbot_bfs_greedy droidbot_bfs_naive droidbot_dfs_greedy droidmate fastbot humanoid monkey qtesting"
+#       - RV_HUMANOID_URL=humanoid:50405
+#       - RV_SKIP_MONITORS="false"
+#       - RV_SKIP_INSTRUMENT="false"
+#       - RV_SKIP_STATIC_ANALYSIS="false"
+#       - ENV_SKIP_EXPERIMENT="false"
+#       - ENV_NO_WINDOW="true"
+#     volumes:
+#       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/apks/tmp:/opt/rvsec/rv-android/apks
+#       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/instrumented:/opt/rvsec/rv-android/out
+#       - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/results:/opt/rvsec/rv-android/results
+#     devices:
+#       - /dev/kvm:/dev/kvm
+#     deploy:
+#       resources:
+#         limits:
+#           cpus: '2'
+#           memory: 8g  # Limita a memória a 512 megabytes
+#     depends_on:
+#       - humanoid

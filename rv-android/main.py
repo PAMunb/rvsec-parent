@@ -50,8 +50,16 @@ def run_cli():
     experiment_config.skip_experiment = utils.get_env_or_default(ENV_SKIP_EXPERIMENT, args.skip_experiment, bool)
     experiment_config.no_window = utils.get_env_or_default(ENV_NO_WINDOW, args.no_window, bool)
 
+    import inspect
+    for nome, valor in inspect.getmembers(experiment_config):
+        if not nome.startswith('_') and isinstance(valor, (int, float, str, bool)):
+            print(f"{nome}: {valor}")
+
+
     validate_experiment_config()
     print_experiment_config()
+
+    # exit(1)
 
     logging.info('############# STARTING EXPERIMENT #############')
     start = time.time()

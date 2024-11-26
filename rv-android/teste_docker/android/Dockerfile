@@ -66,7 +66,8 @@ RUN mkdir $HOME/.android/ &&  \
 #COPY scripts/emulator-monitoring.sh /opt/
 #RUN chmod +x /opt/*.sh
 
-
+# Instalar as dependências necessárias para o emulador Android
+#RUN apt-get update && apt-get install -y qemu-kvm libvirt
 
 # https://developer.android.com/studio#command-tools
 #RUN apt update && apt -qq -y --no-install-recommends install libx11-6 qemu-system-x86 qemu-kvm qemu-utils telnet iptables bridge-utils iproute2 iputils-ping dnsmasq net-tools cpu-checker lshw && \

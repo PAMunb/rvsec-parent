@@ -42,10 +42,20 @@ RUN npm install -g appium@1.22.3 && \
 #    git clone https://github.com/yzygitzh/Humanoid.git . && \
 #    pip install pyflann
 
+ENV RV_REPETITIONS="1"
+ENV RV_TIMEOUTS="60"
+ENV RV_TOOLS="monkey"
+ENV RV_HUMANOID_URL="127.0.0.1:50405"
+ENV RV_SKIP_MONITORS="false"
+ENV RV_SKIP_INSTRUMENT="false"
+ENV RV_SKIP_STATIC_ANALYSIS="false"
+ENV ENV_SKIP_EXPERIMENT="false"
+ENV ENV_NO_WINDOW="true"
 
 VOLUME /opt/rvsec/rv-android/apks
 VOLUME /opt/rvsec/rv-android/out
 VOLUME /opt/rvsec/rv-android/results
 
+WORKDIR /opt/rvsec/rv-android
 
-ENTRYPOINT ["/bin/bash"]
+CMD ["bash", "run_experiment.sh"]

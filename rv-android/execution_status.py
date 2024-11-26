@@ -96,8 +96,8 @@ def get_errors(task: Task, results_dir: str):
 
 
 if __name__ == '__main__':
-    # memory_file_path = sys.argv[1]
-    memory_file_path = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241119111618/execution_memory.json"
+    memory_file_path = sys.argv[1]
+    # memory_file_path = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241119111618/execution_memory.json"
     if os.path.exists(memory_file_path):
         data = status(memory_file_path)
         print(json.dumps(data, indent=2))

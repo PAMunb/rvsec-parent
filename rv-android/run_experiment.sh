@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #--no_window --skip_monitors --skip_instrument --skip_static_analysis --skip_experiment --debug
 #python main.py -tools monkey droidbot droidbot_dfs_greedy -r 1 -t 90 120 150

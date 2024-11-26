@@ -6,7 +6,6 @@ import sys
 import time
 from argparse import Namespace
 from datetime import datetime
-from typing import Union, List
 
 import utils
 from constants import *
@@ -41,15 +40,15 @@ def run_cli():
             print(" [{0}] {1} \n".format(key, available_tools[key].description))
         sys.exit(0)
 
-    experiment_config.memory_file = get_env_or_default(ENV_MEMORY_FILE, args.c)
-    experiment_config.repetitions = get_env_or_default(ENV_REPETITIONS, args.r, int)
-    experiment_config.timeouts = get_env_or_default(ENV_TIMEOUTS, args.t, list[int])
+    experiment_config.memory_file = utils.get_env_or_default(ENV_MEMORY_FILE, args.c)
+    experiment_config.repetitions = utils.get_env_or_default(ENV_REPETITIONS, args.r, int)
+    experiment_config.timeouts = utils.get_env_or_default(ENV_TIMEOUTS, args.t, list[int])
     experiment_config.tools = get_selected_tools(args)
-    experiment_config.generate_monitors = not get_env_or_default(ENV_SKIP_MONITORS, args.skip_monitors, bool)
-    experiment_config.instrument = not get_env_or_default(ENV_SKIP_INSTRUMENT, args.skip_instrument, bool)
-    experiment_config.static_analysis = not get_env_or_default(ENV_SKIP_STATIC_ANALYSIS, args.skip_static_analysis, bool)
-    experiment_config.skip_experiment = get_env_or_default(ENV_SKIP_EXPERIMENT, args.skip_experiment, bool)
-    experiment_config.no_window = get_env_or_default(ENV_NO_WINDOW, args.no_window, bool)
+    experiment_config.generate_monitors = not utils.get_env_or_default(ENV_SKIP_MONITORS, args.skip_monitors, bool)
+    experiment_config.instrument = not utils.get_env_or_default(ENV_SKIP_INSTRUMENT, args.skip_instrument, bool)
+    experiment_config.static_analysis = not utils.get_env_or_default(ENV_SKIP_STATIC_ANALYSIS, args.skip_static_analysis, bool)
+    experiment_config.skip_experiment = utils.get_env_or_default(ENV_SKIP_EXPERIMENT, args.skip_experiment, bool)
+    experiment_config.no_window = utils.get_env_or_default(ENV_NO_WINDOW, args.no_window, bool)
 
     validate_experiment_config()
     print_experiment_config()
@@ -84,7 +83,7 @@ def load_tools():
 
 
 def get_selected_tools(args: Namespace):
-    args_tools = get_env_or_default(ENV_TOOLS, args.tools, list[str])
+    args_tools = utils.get_env_or_default(ENV_TOOLS, args.tools, list[str])
     selected_tools = __get_tools(args_tools)
     if len(selected_tools) == 0 and not args.skip_experiment:
         print("No valid tools selected.")
@@ -103,27 +102,6 @@ def __get_tools(names: list[str]) -> list[AbstractTool]:
 
 def qualified_name(p):
     return p.replace(".py", "").replace("./", "").replace("/", ".")
-
-
-def get_env_or_default(env_var: str, default_value: Union[str, int, bool, List], value_type: type = str, separator: str = " ") -> Union[str, int, bool, List]:
-    value = os.getenv(env_var)
-    if value is None:
-        return default_value
-    else:
-        if value_type == str:
-            return str(value)
-        elif value_type == int:
-            return int(value)
-        elif value_type == bool:
-            return value.lower() == "true"
-        elif value_type == list:
-            return value.split(separator)
-        elif value_type == list[str]:
-            return [str(item) for item in value.split(separator)]
-        elif value_type == list[int]:
-            return [int(item) for item in value.split(separator)]
-        else:
-            return value
 
 
 def create_argument_parser():

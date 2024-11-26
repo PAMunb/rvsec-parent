@@ -3,3 +3,4 @@ networkx
 requests
 call-function-with-timeout
 psutil
+rich

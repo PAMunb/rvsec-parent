@@ -58,4 +58,4 @@ VOLUME /opt/rvsec/rv-android/results
 
 WORKDIR /opt/rvsec/rv-android
 
-CMD ["bash", "run_experiment.sh"]
+CMD ["run_experiment.sh"]

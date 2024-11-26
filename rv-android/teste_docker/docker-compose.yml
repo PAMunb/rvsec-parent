@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+   rv01:
+     image: phtcosta/rvandroid:0.0.1
+     container_name: rv01
+     environment:
+     - HUMANOID_URL=humanoid:50405
+     devices:
+     - /dev/kvm:/dev/kvm
+#     depends_on:
+#     - humanoid
+#   humanoid:
+#     image: phtcosta/humanoid:1.0
+#     container_name: humanoid
+#     ports:
+#     - 50405:50405
+#     healthcheck:
+#       test: [ "CMD", "curl", "-f", "http://localhost:50405" ]
+#       interval: 5s
+#       timeout: 3s
+#       retries: 5

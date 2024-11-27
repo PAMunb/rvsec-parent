@@ -1,22 +1,22 @@
 version: '3.7'
 services:
-#   humanoid:
-#     image: phtcosta/humanoid:1.0
-#     container_name: humanoid
-#     ports:
-#     - 50405:50405
-#     healthcheck:
-#       test: [ "CMD", "curl", "-f", "http://127.0.0.1:50405" ]
-#       interval: 5s
-#       timeout: 3s
-#       retries: 5
+   humanoid:
+     image: phtcosta/humanoid:1.0
+     container_name: humanoid
+     ports:
+     - 50405:50405
+     healthcheck:
+       test: [ "CMD", "curl", "-f", "http://127.0.0.1:50405" ]
+       interval: 5s
+       timeout: 3s
+       retries: 5
    rv01:
      image: phtcosta/rvandroid:0.0.1
      container_name: rv01
      environment:
        - RV_REPETITIONS=1
-       - RV_TIMEOUTS=60
-       - RV_TOOLS=ape monkey
+       - RV_TIMEOUTS=180
+       - RV_TOOLS=monkey humanoid
        - RV_HUMANOID_URL=humanoid:50405
        - ENV_NO_WINDOW=true
      volumes:
@@ -25,8 +25,8 @@ services:
        - /home/pedro/desenvolvimento/RV_ANDROID/EXPERIMENTO_02/BASE/results:/opt/rvsec/rv-android/results
      devices:
        - /dev/kvm:/dev/kvm
-#     depends_on:
-#       - humanoid
+     depends_on:
+       - humanoid
 #   rv_example:
 #     image: phtcosta/rvandroid:0.0.1
 #     container_name: rv_example
@@ -47,6 +47,7 @@ services:
 #     devices:
 #       - /dev/kvm:/dev/kvm
 #     deploy:
+# TODO quando coloquei os limites demorou mais pra iniciar o emulador ... acho q coloquei pouco?
 #       resources:
 #         limits:
 #           cpus: '2'

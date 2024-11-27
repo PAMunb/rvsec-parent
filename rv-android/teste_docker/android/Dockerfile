@@ -96,4 +96,4 @@ RUN apt update && apt -qq -y --no-install-recommends install bzip2 libdrm-dev \
 
 #WORKDIR /opt/rvsec/rv-android
 
-ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["/bin/bash"]

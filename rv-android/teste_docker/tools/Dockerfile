@@ -29,10 +29,13 @@ WORKDIR /opt/rvsec/rv-android
 
 #RUN chmod a+x run_experiment.sh
 
-ENV PATH=/opt/rvsec/rv-android/venv/bin:$PATH
+ENV VIRTUAL_ENV=/opt/rvsec/rv-android/venv
+ENV PYTHONPATH=/opt/rvsec/rv-android:$PYTHONPATH
+#ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN mkdir /opt/rvsec/rv-android/apks && \
     cp /opt/rvsec/rv-android/apks_examples/cryptoapp.apk /opt/rvsec/rv-android/apks/
 
-ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["python", "main.py"]
 #CMD ["python", "main.py"]

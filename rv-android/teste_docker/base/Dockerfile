@@ -6,7 +6,6 @@ SHELL ["/bin/bash", "-c"]
 
 ENV ASPECTJ_HOME=/opt/aspectj
 ENV PATH=$ASPECTJ_HOME/bin:$PATH
-#ENV PATH=$ASPECTJ_HOME/bin:/usr/local/bin:/usr/bin:/bin:$PATH
 
 # Install basic packages (including: java, python and maven)
 RUN apt-get update && \

@@ -39,7 +39,14 @@ echo "APKS_DIR=${APKS_DIR}"
 #phtcosta/rvandroid_tools:0.0.1
 
 
-docker run --rm phtcosta/rvandroid_tools:0.0.1 python --version
+docker run -it --rm --device /dev/kvm --entrypoint "/bin/bash" --name rvsec_teste-03 \
+-v $APKS_DIR:/opt/rvsec/rv-android/apks \
+-v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
+-v $RESULTS_DIR:/opt/rvsec/rv-android/results \
+-e MEMORY=6144 -e CORES=2 \
+phtcosta/rvandroid_tools:0.0.1
+
+#docker run --rm phtcosta/rvandroid_tools:0.0.1 python --version
 
 #docker run -d --device /dev/kvm -p 5555:5555 -v androiddata:/data -e PARTITION=24576 -e MEMORY=6144 -e CORES=2 --name docker-android-emulator cndaqiang/docker-android-emulator:api-33
 

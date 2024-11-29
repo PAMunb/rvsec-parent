@@ -19,25 +19,25 @@ echo "APKS_DIR=${APKS_DIR}"
 #-e MEMORY=6144 -e CORES=2 \
 #phtcosta/rvandroid:0.0.1
 
-docker run -it --rm --name rv01 --device /dev/kvm \
-  -e RV_REPETITIONS=1 \
-  -e RV_TIMEOUTS=300 \
-  -e RV_TOOLS="monkey ares qtesting droidbot" \
-  -e ENV_NO_WINDOW=true \
-  -e MEMORY=6144 -e CORES=2 \
-  -v $APKS_DIR:/opt/rvsec/rv-android/apks \
-  -v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
-  -v $RESULTS_DIR:/opt/rvsec/rv-android/results \
-  phtcosta/rvandroid:0.0.1
+#docker run -it --rm --name rv01 --device /dev/kvm \
+#  -e RV_REPETITIONS=1 \
+#  -e RV_TIMEOUTS=300 \
+#  -e RV_TOOLS="monkey ares qtesting droidbot" \
+#  -e ENV_NO_WINDOW=true \
+#  -e MEMORY=6144 -e CORES=2 \
+#  -v $APKS_DIR:/opt/rvsec/rv-android/apks \
+#  -v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
+#  -v $RESULTS_DIR:/opt/rvsec/rv-android/results \
+#  phtcosta/rvandroid:0.0.1
 
 
 
 
-#docker run -it --rm --device /dev/kvm --entrypoint "/bin/bash" --name rvsec-01 \
-#-v $APKS_DIR:/opt/rvsec/rv-android/apks \
-#-v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
-#-v $RESULTS_DIR:/opt/rvsec/rv-android/results \
-#-e MEMORY=6144 -e CORES=2 \
-#phtcosta/rvandroid:0.0.1
+docker run -it --rm --device /dev/kvm --entrypoint "/bin/bash" --name rvsec-01 \
+-v $APKS_DIR:/opt/rvsec/rv-android/apks \
+-v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
+-v $RESULTS_DIR:/opt/rvsec/rv-android/results \
+-e MEMORY=6144 -e CORES=2 \
+phtcosta/rvandroid:0.0.1
 
 #docker run -d --device /dev/kvm -p 5555:5555 -v androiddata:/data -e PARTITION=24576 -e MEMORY=6144 -e CORES=2 --name docker-android-emulator cndaqiang/docker-android-emulator:api-33

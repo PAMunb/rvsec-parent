@@ -10,7 +10,7 @@ ENV PATH=$ASPECTJ_HOME/bin:$PATH
 # Install basic packages (including: java, python and maven)
 RUN apt-get update && \
     apt install -qq -y --no-install-recommends curl wget zip unzip git nano software-properties-common openjdk-11-jdk \
-    maven npm psmisc python2 ruby2.7 gnuplot procps && \
+    maven npm psmisc python2 gnuplot procps && \
     curl  https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2 && \
     pip2 install virtualenv && \
     apt autoremove -y && \
@@ -24,13 +24,18 @@ RUN apt-get update && \
 #python2 -m virtualenv venv2
 
 # Install aspectj
+#RUN mkdir $ASPECTJ_HOME && \
+#    wget 'https://www.eclipse.org/downloads/download.php?file=/tools/aspectj/aspectj-1.9.6.jar&r=1' -O aspectj-1.9.6.jar && \
+#    java -jar aspectj-1.9.6.jar -to $ASPECTJ_HOME && \
+#    mv $ASPECTJ_HOME/bin/ajc $ASPECTJ_HOME/bin/ajc_original && \
+#    sed 's/-Xmx64M/-Xmx4096M/g' $ASPECTJ_HOME/bin/ajc_original > $ASPECTJ_HOME/bin/ajc && \
+#    chmod a+x $ASPECTJ_HOME/bin/ajc && \
+#    rm aspectj-1.9.6.jar
 RUN mkdir $ASPECTJ_HOME && \
     wget 'https://www.eclipse.org/downloads/download.php?file=/tools/aspectj/aspectj-1.9.6.jar&r=1' -O aspectj-1.9.6.jar && \
     java -jar aspectj-1.9.6.jar -to $ASPECTJ_HOME && \
-    mv $ASPECTJ_HOME/bin/ajc $ASPECTJ_HOME/bin/ajc_original && \
-    sed 's/-Xmx64M/-Xmx4096M/g' $ASPECTJ_HOME/bin/ajc_original > $ASPECTJ_HOME/bin/ajc && \
+    sed -i 's/-Xmx64M/-Xmx4096M/g' $ASPECTJ_HOME/bin/ajc && \
     chmod a+x $ASPECTJ_HOME/bin/ajc && \
     rm aspectj-1.9.6.jar
-
 
 #ENTRYPOINT ["/bin/bash"]

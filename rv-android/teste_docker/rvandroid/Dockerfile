@@ -3,8 +3,7 @@ FROM phtcosta/rvsec_android:0.0.1
 WORKDIR /opt
 RUN git clone https://github.com/honeynet/droidbot.git && \
     cd droidbot && \
-    mv setup.py setup_original.py && \
-    sed 's/androguard>=3.4.0a1/androguard==3.4.0a1/g' setup_original.py > setup.py && \
+    sed -i 's/androguard>=3.4.0a1/androguard==3.4.0a1/g' setup.py && \
     pip3 install -e .
 
 

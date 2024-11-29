@@ -31,7 +31,8 @@ def run_cli():
     args: Namespace = parser.parse_args()
 
     # Logging configuration
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if args.debug else logging.INFO)
+    log_debug = utils.get_env_or_default(ENV_DEBUG, args.debug, bool)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if log_debug else logging.INFO)
     logging.getLogger("androguard").setLevel(logging.ERROR)
 
     if args.list_tools:
@@ -50,16 +51,13 @@ def run_cli():
     experiment_config.skip_experiment = utils.get_env_or_default(ENV_SKIP_EXPERIMENT, args.skip_experiment, bool)
     experiment_config.no_window = utils.get_env_or_default(ENV_NO_WINDOW, args.no_window, bool)
 
-    import inspect
-    for nome, valor in inspect.getmembers(experiment_config):
-        if not nome.startswith('_') and isinstance(valor, (int, float, str, bool)):
-            print(f"{nome}: {valor}")
-
-
     validate_experiment_config()
     print_experiment_config()
 
-    # exit(1)
+    delay = utils.get_env_or_default(ENV_DELAY, 0, int)
+    if delay > 0:
+        logging.info(f"Sleeping for {delay} seconds ...")
+        time.sleep(delay)
 
     logging.info('############# STARTING EXPERIMENT #############')
     start = time.time()
@@ -220,8 +218,8 @@ def run_local():
     _3_hour = 3 * _1_hour
 
     experiment_config.repetitions = 1
-    experiment_config.timeouts = [60, 120, 180]
-    experiment_config.tools = __get_tools(["droidbot", "droidmate", "ares", "droidbot_bfs_naive", "qtesting"])
+    experiment_config.timeouts = [60]
+    experiment_config.tools = __get_tools(["droidmate"])
     # "ape", "fastbot", "droidbot_dfs_greedy", "ares", "qtesting"
     # testados: monkey, ape, fastbot, droidmate
     # "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid"

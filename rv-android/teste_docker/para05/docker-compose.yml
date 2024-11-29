@@ -28,7 +28,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "3"
+          cpus: "8"
           memory: 16g
     depends_on:
       - humanoid
@@ -50,7 +50,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "3"
+          cpus: "8"
           memory: 16g
     depends_on:
       - humanoid
@@ -72,7 +72,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "3"
+          cpus: "8"
           memory: 16g
     depends_on:
       - humanoid
@@ -94,7 +94,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "3"
+          cpus: "8"
           memory: 16g
     depends_on:
       - humanoid
@@ -116,7 +116,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "3"
+          cpus: "8"
           memory: 16g
     depends_on:
       - humanoid

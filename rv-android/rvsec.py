@@ -27,6 +27,7 @@ class RVSec(object):
     @staticmethod
     def __java_mop():
         logging.info("Executing JavaMOP")
+        logging.info(f"MOP specs dir: {MOP_DIR}")
         mop_files = os.path.join(MOP_DIR, '*' + EXTENSION_MOP)
         javamop_cmd = Command(JAVAMOP_BIN, ['-d', MOP_OUT_DIR, '-merge', mop_files])
         utils.execute_command(javamop_cmd, "javamop")

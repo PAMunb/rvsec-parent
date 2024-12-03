@@ -2,6 +2,9 @@ import os
 import time
 from pathlib import Path
 
+import utils
+from constants import ENV_JCA_SPEC
+
 TIMESTAMP = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
 START = time.time()
@@ -28,8 +31,10 @@ RV_MONITOR_BIN = os.path.join(RV_MONITOR_HOME, 'bin', 'rv-monitor')
 RVSEC_DIR = os.path.join(RVSEC_ROOT_DIR, 'rvsec')
 
 MOP_BASE_DIR = os.path.join(RVSEC_DIR, 'rvsec-mop', 'src', 'main', 'resources')
-MOP_DIR = os.path.join(MOP_BASE_DIR, 'jca')
-# MOP_DIR = os.path.join(MOP_BASE_DIR, 'generic')
+MOP_JCA_DIR = os.path.join(MOP_BASE_DIR, 'jca')
+MOP_GENERIC_DIR = os.path.join(MOP_BASE_DIR, 'generic')
+IS_JCA = utils.get_env_or_default(ENV_JCA_SPEC, True, bool)
+MOP_DIR = MOP_JCA_DIR if IS_JCA else MOP_GENERIC_DIR
 ASPECTS_DIR = os.path.join(MOP_BASE_DIR, 'aspect')
 MOP_OUT_DIR = os.path.join(WORKING_DIR, 'mop_out')
 # TODO (coverage.aj)

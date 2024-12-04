@@ -69,8 +69,34 @@ def __parse_coverage(message: str) -> RvCoverage:
 
 
 def __parse_error(message: str) -> RvError:
-    s = message.split(",")
-    return RvError(s[0], s[5], s[1], s[3], s[4], " ".join(s[6:]))
+    # if generic spec
+    if message.endswith("went into an error state."):
+        generic = __parse_error_generic_spec(message)
+        return RvError(generic["spec"], generic["spec"], generic["class"],
+                       generic["method"], generic["file_name"], generic["message"])
+    else:
+        # JCA spec
+        s = message.split(",")
+        return RvError(s[0], s[5], s[1], s[3], s[4], " ".join(s[6:]))
+
+
+def __parse_error_generic_spec(log_line):
+    pattern = r"(.*)\.(.*)\((.*):(.*)\) ::: (.*) went into an error state."
+    match = re.match(pattern, log_line)
+
+    if match:
+        class_name, method_name, file_name, line_number, spec = match.groups()
+        # file_name, line_number = file_info.split(":")
+        return {
+            "class": class_name,
+            "method": method_name,
+            "file_name": file_name,
+            "line_number": int(line_number),
+            "spec": spec,
+            "message": "{} went into an error state.".format(spec)
+        }
+    else:
+        return None
 
 
 def __to_datetime(date: str, time: str) -> datetime:

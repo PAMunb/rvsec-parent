@@ -13,7 +13,7 @@ WORKING_DIR = os.getcwd()
 
 APKS_DIR = os.path.join(WORKING_DIR, 'apks')
 #APKS_DIR = os.path.join(WORKING_DIR, 'apks_tmp')
-# APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', '02')
+# APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', 'GENERIC_SPECS', "pre_selecao")
 RESULTS_DIR = os.path.join(WORKING_DIR, 'results')
 # INSTRUMENTED_DIR = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_experiment02/instrumented"
 INSTRUMENTED_DIR = os.path.join(WORKING_DIR, 'out')
@@ -35,6 +35,7 @@ MOP_JCA_DIR = os.path.join(MOP_BASE_DIR, 'jca')
 MOP_GENERIC_DIR = os.path.join(MOP_BASE_DIR, 'generic')
 IS_JCA = utils.get_env_or_default(ENV_JCA_SPEC, True, bool)
 MOP_DIR = MOP_JCA_DIR if IS_JCA else MOP_GENERIC_DIR
+# MOP_DIR = MOP_GENERIC_DIR
 ASPECTS_DIR = os.path.join(MOP_BASE_DIR, 'aspect')
 MOP_OUT_DIR = os.path.join(WORKING_DIR, 'mop_out')
 # TODO (coverage.aj)

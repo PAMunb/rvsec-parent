@@ -1,5 +1,6 @@
 # import analysis.methods_extractor as me
 import json
+import os
 from datetime import datetime
 
 import utils
@@ -55,9 +56,10 @@ class Memory:
     @staticmethod
     def read(memory_file: str):
         memory = Memory()
+        base_results_dir = os.path.dirname(memory_file)
         with open(memory_file, "r") as file:
             result = json.load(file)
-            memory.tasks, memory.tasks_map = memory.__from_result(result)
+            memory.tasks, memory.tasks_map = memory.__from_result(result, base_results_dir)
         return memory
 
     def write(self, memory_file: str):
@@ -81,7 +83,7 @@ class Memory:
         return result
 
     @staticmethod
-    def __from_result(result):
+    def __from_result(result, base_results_dir:str ):
         tasks = []
         mapa = {}
         for apk, rep_data in result.items():
@@ -95,6 +97,7 @@ class Memory:
                         mapa[apk][rep][timeout] = {}
                     for tool, data in tool_data.items():
                         task = Task(apk, int(rep), int(timeout), tool)
+                        task.init(base_results_dir)
                         task.executed = data["executed"]
                         task.start_time = datetime.fromtimestamp(data["start"])
                         task.finish_time = datetime.fromtimestamp(data["finish"])

@@ -1,6 +1,5 @@
 FROM phtcosta/rvsec_base:0.0.1
 
-#ENV DEBIAN_FRONTEND=noninteractive
 
 # Arguments that can be overriden at build-time.
 ARG API_LEVEL=29
@@ -49,29 +48,8 @@ RUN mkdir $HOME/.android/ &&  \
     touch $HOME/.android/repositories.cfg && \
 	mkdir /data
 
-#COPY license_accepter.sh /opt/android/license_accepter.sh
-# Exporting ADB keys.
-#COPY keys/* /root/.android/
-
-
-# The following layers will download the Android command-line tools
-# to install the Android SDK, emulator and system images.
-# It will then install the Android SDK and emulator.
-#COPY scripts/install-sdk.sh /opt/
-#RUN chmod +x /opt/install-sdk.sh
-#
-#
-## Copy the container scripts in the image.
-#COPY scripts/start-emulator.sh /opt/
-#COPY scripts/emulator-monitoring.sh /opt/
-#RUN chmod +x /opt/*.sh
-
-# Instalar as dependências necessárias para o emulador Android
-#RUN apt-get update && apt-get install -y qemu-kvm libvirt
 
 # https://developer.android.com/studio#command-tools
-#RUN apt update && apt -qq -y --no-install-recommends install libx11-6 qemu-system-x86 qemu-kvm qemu-utils telnet iptables bridge-utils iproute2 iputils-ping dnsmasq net-tools cpu-checker lshw && \
-#RUN apt update && apt -qq -y --no-install-recommends install python3-pip python3-venv python-is-python3 openjdk-8-jdk maven curl unzip wget zip unzip git libgl1-mesa-glx xvfb && \
 RUN apt update && apt -qq -y --no-install-recommends install bzip2 libdrm-dev \
 	libxkbcommon-dev libgbm-dev libasound-dev libnss3 \
 	libxcursor1 libpulse-dev libxshmfence-dev \
@@ -82,18 +60,22 @@ RUN apt update && apt -qq -y --no-install-recommends install bzip2 libdrm-dev \
 	unzip *tools*linux*.zip -d $ANDROID_HOME/cmdline-tools && \
 	mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/tools && \
 	rm *tools*linux*.zip && \
-#    wget https://dl.google.com/android/repository/commandlinetools-linux-${CMD_LINE_VERSION}.zip -P /tmp && \
-#    mkdir $ANDROID_SDK_ROOT/cmdline-tools/ && \
-#    unzip /tmp/commandlinetools-linux-${CMD_LINE_VERSION}.zip -d $ANDROID_SDK_ROOT/cmdline-tools/ && \
-#    mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools/ $ANDROID_SDK_ROOT/cmdline-tools/tools/ && \
-#    rm /tmp/commandlinetools-linux-${CMD_LINE_VERSION}.zip && \
     yes Y | sdkmanager --licenses && \
     sdkmanager --install ${ANDROID_SDK_PACKAGES} && \
-#    yes Y | sdkmanager --verbose --no_https ${ANDROID_SDK_PACKAGES} && \
-#    echo "no" | avdmanager --verbose create avd --force --name "${EMULATOR_NAME}" --device "pixel" --package "${PACKAGE_PATH}" && \
     echo "no" | avdmanager --verbose create avd --force --name "$EMULATOR_NAME" --abi "$ABI" --package "$PACKAGE_PATH" --device "$DEVICE_ID"
-#    chmod +x /opt/android/license_accepter.sh && ./opt/android/license_accepter.sh $ANDROID_SDK_ROOT
 
-#WORKDIR /opt/rvsec/rv-android
 
-#ENTRYPOINT ["/bin/bash"]
+#COPY license_accepter.sh /opt/android/license_accepter.sh
+# Exporting ADB keys.
+#COPY keys/* /root/.android/
+#
+# The following layers will download the Android command-line tools
+# to install the Android SDK, emulator and system images.
+# It will then install the Android SDK and emulator.
+#COPY scripts/install-sdk.sh /opt/
+#RUN chmod +x /opt/install-sdk.sh
+#
+## Copy the container scripts in the image.
+#COPY scripts/start-emulator.sh /opt/
+#COPY scripts/emulator-monitoring.sh /opt/
+#RUN chmod +x /opt/*.sh

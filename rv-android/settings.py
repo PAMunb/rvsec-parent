@@ -1,5 +1,9 @@
 import os
 import time
+from pathlib import Path
+
+import utils
+from constants import ENV_JCA_SPEC
 
 TIMESTAMP = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
@@ -8,8 +12,10 @@ START = time.time()
 WORKING_DIR = os.getcwd()
 
 APKS_DIR = os.path.join(WORKING_DIR, 'apks')
-#APKS_DIR = os.path.join(WORKING_DIR, 'apks_mini')
+#APKS_DIR = os.path.join(WORKING_DIR, 'apks_tmp')
+# APKS_DIR = os.path.join(WORKING_DIR, 'apks_experiment02', 'GENERIC_SPECS', "pre_selecao")
 RESULTS_DIR = os.path.join(WORKING_DIR, 'results')
+# INSTRUMENTED_DIR = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_experiment02/instrumented"
 INSTRUMENTED_DIR = os.path.join(WORKING_DIR, 'out')
 LIB_DIR = os.path.join(WORKING_DIR, 'lib')
 
@@ -24,10 +30,15 @@ RV_MONITOR_HOME = os.path.join(RVSEC_ROOT_DIR, 'rv-monitor')
 RV_MONITOR_BIN = os.path.join(RV_MONITOR_HOME, 'bin', 'rv-monitor')
 RVSEC_DIR = os.path.join(RVSEC_ROOT_DIR, 'rvsec')
 
-MOP_DIR = os.path.join(RVSEC_DIR, 'rvsec-mop', 'src', 'main', 'resources')
-# MOP_DIR = os.path.join(WORKING_DIR, 'mop')
+MOP_BASE_DIR = os.path.join(RVSEC_DIR, 'rvsec-mop', 'src', 'main', 'resources')
+MOP_JCA_DIR = os.path.join(MOP_BASE_DIR, 'jca')
+MOP_GENERIC_DIR = os.path.join(MOP_BASE_DIR, 'generic')
+IS_JCA = utils.get_env_or_default(ENV_JCA_SPEC, True, bool)
+MOP_DIR = MOP_JCA_DIR if IS_JCA else MOP_GENERIC_DIR
+# MOP_DIR = MOP_GENERIC_DIR
+ASPECTS_DIR = os.path.join(MOP_BASE_DIR, 'aspect')
 MOP_OUT_DIR = os.path.join(WORKING_DIR, 'mop_out')
-#TODO (coverage.aj)
+# TODO (coverage.aj)
 MOP_INCLUDE_DIR = os.path.join(WORKING_DIR, 'mop-include')
 
 D2J_HOME = os.path.join(LIB_DIR, 'dex2jar')
@@ -45,3 +56,5 @@ ANDROID_JAR_PATH = os.path.join(ANDROID_PLATFORM_LIB, 'android.jar')
 
 KEYSTORE_FILE = os.path.join(WORKING_DIR, 'keystore.jks')
 KEYSTORE_PASSWORD = 'password'
+
+RT_JAR = os.path.join(Path.home(), '.sdkman', 'candidates', 'java', '8.0.302-open', 'jre', 'lib', 'rt.jar')

@@ -5,10 +5,12 @@ sudo kvm-ok
 
 curl -s "https://get.sdkman.io" | bash
 source "$HOME/.sdkman/bin/sdkman-init.sh"
-sdk install java 11.0.21-tem
+sdk install java 8.0.302-open
+sdk install java 11.0.21-tem (default)
 sdk install maven 3.9.5
 
-#TODO configure docker: https://docs.docker.com/engine/install/debian/
+# TODO configure docker:
+# https://docs.docker.com/engine/install/debian/
 
 cd
 mkdir aspectj
@@ -17,9 +19,9 @@ java -jar aspectj-1.9.6.jar -to aspectj
 
 
 cd
-git clone https://github.com/PAMunb/rvsec.git
+git clone --branch taint https://github.com/PAMunb/rvsec.git
 cd rvsec/
-git checkout develop
+#git checkout develop
 mvn clean install -DskipTests -DskipMopAgent
 
 
@@ -47,8 +49,8 @@ cd /home/pedro/rvsec/rv-android/scripts
 
 cd /home/pedro/rvsec/rv-android
 #pip install virtualenv
-#python -m venv env
-#source env/bin/activate
+#python -m venv venv
+#source venv/bin/activate
 #pip list
 pip3 install -r requirements.txt
 

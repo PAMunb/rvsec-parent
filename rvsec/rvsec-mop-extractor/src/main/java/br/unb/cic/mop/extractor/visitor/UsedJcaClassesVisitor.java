@@ -15,6 +15,7 @@ import javamop.parser.ast.mopspec.EventDefinition;
 import javamop.parser.ast.mopspec.JavaMOPSpec;
 
 public class UsedJcaClassesVisitor extends VoidVisitorAdapter<Object> {
+	private Set<String> specs = new HashSet<>();
 	private Set<String> classes = new HashSet<>();
 	private Map<String, String> imports = new HashMap<>();
 
@@ -22,7 +23,7 @@ public class UsedJcaClassesVisitor extends VoidVisitorAdapter<Object> {
 
 	@Override
 	public void visit(MOPSpecFile f, Object arg) {
-		if (f.getSpecs() != null) {
+		if (f.getSpecs() != null) {			
 			f.getImports().forEach(i -> i.accept(this, arg));
 			f.getSpecs().forEach(i -> i.accept(this, arg));
 		}
@@ -40,6 +41,7 @@ public class UsedJcaClassesVisitor extends VoidVisitorAdapter<Object> {
 
 	@Override
 	public void visit(JavaMOPSpec s, Object arg) {
+		specs.add(s.getName());
 		if (s.getEvents() != null) {
 			for (EventDefinition e : s.getEvents()) {
 				e.accept(this, arg);
@@ -71,6 +73,10 @@ public class UsedJcaClassesVisitor extends VoidVisitorAdapter<Object> {
 
 	public Set<String> getClasses() {
 		return classes;
+	}
+	
+	public Set<String> getSpecs() {
+		return specs;
 	}
 
 }

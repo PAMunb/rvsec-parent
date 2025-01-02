@@ -6,7 +6,6 @@ import os.path
 def execute(errors_file: str, out_file: str):
     apks = complete(errors_file)
 
-
     cont_ajc = 0
     cont_d8 = 0
     for a in apks:

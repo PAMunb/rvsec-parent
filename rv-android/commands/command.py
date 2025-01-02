@@ -1,7 +1,10 @@
+import os
 import sys
 from threading import Timer
 
 from subprocess import PIPE, Popen
+import signal
+import psutil
 
 # Only use this when the program is running on Python 3.3+
 if sys.version_info.major == 3 and sys.version_info.minor >= 3:
@@ -12,6 +15,35 @@ from .command_result import CommandResult
 import logging as logging_api
 
 logging = logging_api.getLogger(__name__)
+
+
+def kill_process_tree(pid):
+    # print(f"kill_process_tree={pid}")
+    parent = psutil.Process(pid)
+    # print(f"parent={parent}")
+    for child in parent.children(recursive=True):
+        # child.kill()
+        # print(f">>> Matando processo filho: {child.pid}")
+        os.kill(child.pid, signal.SIGKILL)
+    # print(f">>> Matando processo  {parent.pid}")
+    # parent.kill()
+    # os.kill(parent.pid, signal.SIGINT)
+    # os.kill(parent.pid, signal.SIGTERM)
+    # print("mandou SIGINT")
+    os.kill(parent.pid, signal.SIGKILL)
+    # parent.kill()
+    # print("mandou SIGKILL")
+    # cont = 0
+    # while cont < 5 and parent.is_running():
+    #     print(f"cont={cont}")
+    #     os.kill(parent.pid, signal.SIGKILL)
+    #     os.kill(parent.pid, signal.SIGINT)
+    #     cont += 1
+    # print(f"nao matou? {parent.is_running()}")
+    # if parent.parent():
+    #     print("possui parent ...")
+    #     kill_process_tree(parent.parent().pid)
+
 
 
 class Command:
@@ -65,8 +97,7 @@ class Command:
                 else:
                     (stdout, stderr) = proc.communicate(stdin)
             except TimeoutExpired:
-                logging.info("The command has timeout after {0} seconds".format(self._timeout))
-                proc.kill()
+                self.kill_process(proc)
                 (stdout, stderr) = proc.communicate(stdin)
             except OSError:
                 raise CommandNotFoundError("The command {0} was not found".format(self._command))
@@ -92,7 +123,9 @@ class Command:
 
     def kill_process(self, p):
         logging.info("The command has timeout after {0} seconds".format(self._timeout))
-        p.kill()
+        # p.kill()
+        # os.kill(p.pid, signal.SIGKILL)
+        kill_process_tree(p.pid)
 
     def invoke_as_deamon(self, stdout=PIPE, stderr=PIPE):
         cmd_args = []

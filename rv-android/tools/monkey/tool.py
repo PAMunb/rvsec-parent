@@ -20,6 +20,6 @@ class ToolSpec(AbstractTool):
                 # '--ignore-crashes',
                 # '--ignore-timeouts',
                 '--ignore-security-exceptions',
-                '10000000'
+                '1000000000' # TODO
             ], timeout)
             exec_cmd.invoke(stdout=trace)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-VERSION=0.0.1
-IMAGE=ares
+VERSION=0.0.2
+IMAGE=phtcosta/ares
 
 docker build --no-cache -t $IMAGE:$VERSION $(dirname $0)
 

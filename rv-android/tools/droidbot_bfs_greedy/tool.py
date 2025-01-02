@@ -23,6 +23,11 @@ class ToolSpec(AbstractTool):
                 app.path,
                 '-policy',
                 'bfs_greedy',
+                "-count",
+                "10000000000",
+                "-timeout",
+                str(timeout),
+                "-ignore_ad",
                 '-is_emulator',
             ], timeout)
             exec_cmd.invoke(stdout=trace)

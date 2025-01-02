@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging as logging_api
 import hashlib
 import logging
@@ -5,6 +6,7 @@ import os
 import shutil
 import sys
 from zipfile import ZipFile, ZIP_DEFLATED
+from typing import Union, List
 
 from app import App
 from commands.command import Command
@@ -170,3 +172,36 @@ def to_readable_time(duration: float):
     else:
         time = '{0} seconds'.format(int(duration))
     return time
+
+
+def datetime_to_milliseconds(date: datetime) -> float:
+    return date.timestamp()
+
+
+def datetime_to_string(date: datetime) -> str:
+    return date.strftime("%d/%b/%Y %H:%M:%S.%f")
+
+
+def milliseconds_to_datetime(timestamp: float) -> datetime:
+    return datetime.fromtimestamp(timestamp)
+
+
+def get_env_or_default(env_var: str, default_value: Union[str, int, bool, List], value_type: type = str, separator: str = " ") -> Union[str, int, bool, List]:
+    value = os.getenv(env_var)
+    if value is None:
+        return default_value
+    else:
+        if value_type == str:
+            return str(value)
+        elif value_type == int:
+            return int(value)
+        elif value_type == bool:
+            return value.lower() == "true"
+        elif value_type == list:
+            return value.split(separator)
+        elif value_type == list[str]:
+            return [str(item) for item in value.split(separator)]
+        elif value_type == list[int]:
+            return [int(item) for item in value.split(separator)]
+        else:
+            return value

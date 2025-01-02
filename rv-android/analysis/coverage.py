@@ -7,20 +7,21 @@ from commands.command import Command
 from settings import LIB_DIR, ANDROID_PLATFORMS_DIR, INSTRUMENTED_DIR, APKS_DIR
 from app import App
 from constants import *
+from log.log import RvCoverage
 
 
-def process_coverage(called_methods: dict[str, set[str]], all_methods: dict):
+def process_coverage(called_methods: dict[str, dict[str, dict[str, RvCoverage]]], all_methods: dict):
     coverage = copy.deepcopy(all_methods)
 
     coverage[SUMMARY] = {TOTAL_CLASSES: len(coverage), TOTAL_ACTIVITIES: 0, CALLED_ACTIVITIES: 0,
-                         ACTIVITIES_COVERAGE: 0, 'activities_coverage_total': 0,
+                         ACTIVITIES_COVERAGE: 0, ACTIVITIES_COVERAGE_TOTAL: 0,
                          TOTAL_METHODS: 0, CALLED_METHODS: 0, METHOD_COVERAGE: 0,
                          TOTAL_METHODS_JCA_REACHABLE: 0, CALLED_METHODS_JCA_REACHABLE: 0,
-                                'methods_jca_reachable_coverage': 0, 'methods_jca_reachable_coverage_total': 0}
+                         'methods_jca_reachable_coverage': 0, 'methods_jca_reachable_coverage_total': 0}
     for clazz in all_methods:
         coverage[clazz][SUMMARY] = {TOTAL_METHODS: 0, CALLED_METHODS: 0, METHOD_COVERAGE: 0,
                                     TOTAL_METHODS_JCA_REACHABLE: 0, CALLED_METHODS_JCA_REACHABLE: 0,
-                                           'methods_jca_reachable_coverage': 0, 'methods_jca_reachable_coverage_total': 0}
+                                    'methods_jca_reachable_coverage': 0, 'methods_jca_reachable_coverage_total': 0}
         if coverage[clazz][IS_ACTIVITY]:
             coverage[SUMMARY][TOTAL_ACTIVITIES] += 1
         for m in coverage[clazz][METHODS]:
@@ -37,7 +38,7 @@ def process_coverage(called_methods: dict[str, set[str]], all_methods: dict):
             continue
         if coverage[clazz][IS_ACTIVITY]:
             coverage[SUMMARY][CALLED_ACTIVITIES] += 1
-        for m in called_methods[clazz]:
+        for m in called_methods[clazz][METHODS]:
             if m not in coverage[clazz][METHODS].keys():
                 continue
             coverage[clazz][METHODS][m][CALLED] = True
@@ -56,7 +57,7 @@ def process_coverage(called_methods: dict[str, set[str]], all_methods: dict):
         coverage[clazz][SUMMARY]['methods_jca_reachable_coverage_total'] = methods_jca_reachable_coverage_total
 
     coverage[SUMMARY][ACTIVITIES_COVERAGE] = calculate_coverage(coverage[SUMMARY][TOTAL_ACTIVITIES], coverage[SUMMARY][CALLED_ACTIVITIES])
-    coverage[SUMMARY]['activities_coverage_total'] = calculate_coverage(coverage[SUMMARY][TOTAL_CLASSES], coverage[SUMMARY][CALLED_ACTIVITIES])
+    coverage[SUMMARY][ACTIVITIES_COVERAGE_TOTAL] = calculate_coverage(coverage[SUMMARY][TOTAL_CLASSES], coverage[SUMMARY][CALLED_ACTIVITIES])
     coverage[SUMMARY][METHOD_COVERAGE] = calculate_coverage(coverage[SUMMARY][TOTAL_METHODS], coverage[SUMMARY][CALLED_METHODS])
     coverage[SUMMARY][METHODS_JCA_COVERAGE] = calculate_coverage(coverage[SUMMARY][TOTAL_METHODS_JCA_REACHABLE], coverage[SUMMARY][CALLED_METHODS_JCA_REACHABLE])
     coverage[SUMMARY]['methods_jca_reachable_coverage_total'] = calculate_coverage(coverage[SUMMARY][TOTAL_METHODS], coverage[SUMMARY][CALLED_METHODS_JCA_REACHABLE])

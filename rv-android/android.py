@@ -29,12 +29,12 @@ class Android:
         logging.info('Starting emulator')
 
         args = ['-avd', avd_name,
-                '-writable-system', # make system & vendor image writable after 'adb remount'
-                '-wipe-data', # reset the user data image (copy it from initdata)
-                '-no-boot-anim', # disable animation for faster boot
-                '-noaudio', # disable audio support
-                '-no-snapshot-save', # do not auto-save to snapshot on exit: abandon changed state
-                '-delay-adb'] # delay adb communication till boot completes
+                '-writable-system',   # make system & vendor image writable after 'adb remount'
+                '-wipe-data',         # reset the user data image (copy it from initdata)
+                '-no-boot-anim',      # disable animation for faster boot
+                '-noaudio',           # disable audio support
+                '-no-snapshot-save',  # do not auto-save to snapshot on exit: abandon changed state
+                '-delay-adb']         # delay adb communication till boot completes
         if no_window:
             args.append('-no-window') # disable graphical window display
 
@@ -57,7 +57,7 @@ class Android:
 
     @staticmethod
     def _wait_for_boot():
-        timeout = 90 #seconds
+        timeout = 90  # seconds
         start = time.time()
         logging.info('Waiting for emulator to boot')
         check_emulator_cmd = Command('adb', ['-s', 'emulator-5554', 'shell', 'getprop', 'init.svc.bootanim'], timeout)
@@ -149,19 +149,3 @@ class Android:
                 if len(platform) == 2:
                     platforms_list.append(platform[1].strip())
         return platforms_list
-
-
-if __name__ == '__main__':
-    import sys
-    logging_api.basicConfig(stream=sys.stdout, level=logging_api.DEBUG)
-    logging_api.info("Executing")
-
-    android = Android()
-
-    platforms = android.list_installed_platforms()
-    for p in platforms:
-        print(p)
-
-    android.install_platform("26")
-    print("INSTALOU !!!!!!!!!!!!!!")
-

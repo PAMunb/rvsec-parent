@@ -24,13 +24,13 @@ class RvAndroid(object):
     def __init__(self):
         pass
 
-    def instrument_apks(self, results_dir: str, force_instrumentation=False):
+    def instrument_apks(self, results_dir: str, force_instrumentation=False, apks_dir=APKS_DIR):
         errors = {}
 
-        # clean directories and copy libraries
-        self.prepare_instrumentation()
+        # clean directories, copy libraries and create INSTRUMENTED_DIR (if not exists)
+        self.prepare_instrumentation(results_dir)
         # retrieves the APKs to be instrumented
-        apks = utils.get_apks(APKS_DIR)
+        apks = utils.get_apks(apks_dir)
 
         total_apks = len(apks)
         cont = 0
@@ -41,7 +41,7 @@ class RvAndroid(object):
                 logging.info("Starting instrumentation {}/{}".format(cont, total_apks))
                 # instruments the APK. 'force_instrumentation' indicates whether the APK
                 # should be re-instrumented if it is already instrumented
-                self.instrument(app, force_instrumentation)
+                self.instrument(app, results_dir, force_instrumentation)
                 # checks if the apk was instrumented
                 self.check_if_instrumented(app)
             except CommandException as ex:
@@ -61,14 +61,16 @@ class RvAndroid(object):
                 logging.info("Errors saved in: {}".format(errors_file))
             for error in errors:
                 logging.warning("ERROR: {}, tool={}".format(error, errors[error]["tool"]))
+        return errors
 
-    def prepare_instrumentation(self):
+    def prepare_instrumentation(self, results_dir=INSTRUMENTED_DIR):
         self.clear([LIB_TMP_DIR, TMP_DIR, RVM_TMP_DIR])
         self.__execute_maven()
+        utils.create_folder_if_not_exists(results_dir)
 
-    def instrument(self, app: App, force_instrumentation=False):
+    def instrument(self, app: App, result_dir=INSTRUMENTED_DIR, force_instrumentation=False):
         # check if the APK exists in 'out' dir and whether it is to be instrumented
-        instrumented_apk = os.path.join(INSTRUMENTED_DIR, app.name)
+        instrumented_apk = os.path.join(result_dir, app.name)
         if os.path.exists(instrumented_apk):
             if force_instrumentation:
                 logging.info("Deleting APK: {}".format(instrumented_apk))
@@ -79,7 +81,6 @@ class RvAndroid(object):
 
         start = time.time()
         logging.info("Instrumenting: {}".format(app.name))
-        # TODO mudar nome do metodo pois nao decompila ... parece q transforma/converte
         self.__decompile_apk(app)
         self.__include_generated_monitors()
         self.__weave_monitors(app)

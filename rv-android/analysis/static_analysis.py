@@ -2,13 +2,9 @@ import logging as logging_api
 import os.path
 import sys
 
-# import analysis.methods_extractor as me
-import utils
-from commands.command import Command
-from constants import EXTENSION_GESDA
-# from task import Task
-from settings import *
 from app import App
+from commands.command import Command
+from settings import *
 
 logging = logging_api.getLogger(__name__)
 
@@ -18,38 +14,51 @@ class StaticAnalysisException(Exception):
 
 
 def run_gesda(app: App, gesda_file: str):
-    if os.path.isfile(gesda_file):
-        logging.info("Skipping APK already analyzed with GESDA: {}".format(app.name))
-        return
-    logging.info("Executing analysis on apk {}: GESDA".format(app.name))
-    print("apk={}".format(app.path))
-    print("gesda_file={}".format(gesda_file))
-    gesda_jar = os.path.join(LIB_DIR, 'gesda', 'rvsec-gesda.jar')
-    print("gesda_jar={}".format(gesda_jar))
+    gesda_jar = os.path.join(LIB_DIR, "gesda", "rvsec-gesda.jar")
     gesda_cmd = Command("java", [
-        '-jar',
+        "-jar",
         gesda_jar,
-        '--android-dir',
+        "--android-dir",
         ANDROID_PLATFORMS_DIR,
-        '--rt-jar',
+        "--rt-jar",
         RT_JAR,
-        '--output',
+        "--output",
         gesda_file,
-        '--apk',
+        "--apk",
         app.path
     ])
-    print("gesda_cmd={}".format(gesda_cmd))
-    gesda_result = gesda_cmd.invoke(stdout=sys.stdout)
-    if gesda_result.code != 0:
-        raise StaticAnalysisException("Error while executing GESDA: {0}. {1}".format(gesda_result.code,
-                                                                                     gesda_result.stderr))
+    __run(app, gesda_file, "GESDA", gesda_cmd)
 
 
-def runXXX(apks_dir: str):
-    apks = utils.get_apks(apks_dir)
-    for apk in apks:
-        logging.info("Analysing APK: {}".format(apk.name))
-        gesda_file = os.path.join(apks_dir, "{}{}".format(apk.name, EXTENSION_GESDA))
-        # TODO try/catch
-        run_gesda(apk, gesda_file)
+def run_gator(app: App, gator_file: str):
+    gator_dir = os.path.join(LIB_DIR, "gator")
+    gator_python = os.path.join(gator_dir, "gator")
+    gator_client_jar = os.path.join(gator_dir, "rvsec-gator-client.jar")
+    gator_cmd = Command("python", [
+        gator_python,
+        "a",
+        "-p",
+        app.path,
+        "--client-jar",
+        gator_client_jar,
+        "--out",
+        gator_file,
+        "-client",
+        "RvsecWtgClient"
+    ])
+    __run(app, gator_file, "GATOR", gator_cmd)
 
+
+def __run(app: App, result_file: str, name: str, command: Command):
+    if os.path.isfile(result_file):
+        logging.info("Skipping APK already analyzed with {}: {}".format(name, app.name))
+        return
+    logging.info("Executing analysis on apk '{}': {}".format(app.name, name))
+    cmd_result = command.invoke(stdout=sys.stdout)
+    if cmd_result.code != 0:
+        raise StaticAnalysisException("Error while executing {0}: {1}. {2}".format(name, cmd_result.code,
+                                                                                   cmd_result.stderr))
+
+
+def run_reachability():
+    pass

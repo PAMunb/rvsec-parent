@@ -1,16 +1,28 @@
 package presto.android.gui.clients.wtg.model;
 
+import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import presto.android.gui.wtg.EventHandler;
+import presto.android.gui.wtg.ds.WTGEdge;
 
 public class Transition {
 	private int sourceId;
 	private int getTargetId;
-	private Event event;
+	private Set<Event> events;
+	private Set<Event> callbacks;
 
-	public Transition(int sourceId, int getTargetId, Event event) {
-		this.sourceId = sourceId;
-		this.getTargetId = getTargetId;
-		this.event = event;
+	public Transition(WTGEdge e) {
+		this.sourceId = e.getSourceNode().getWindow().id;
+		this.getTargetId = e.getTargetNode().getWindow().id;
+		this.events = toEvents(e.getWTGHandlers());
+		this.callbacks = toEvents(e.getCallbacks());
+	}
+
+	private Set<Event> toEvents(Collection<EventHandler> handlers) {
+		return handlers.stream().map(Event::new).collect(Collectors.toSet());
 	}
 
 	public int getSourceId() {
@@ -21,13 +33,17 @@ public class Transition {
 		return getTargetId;
 	}
 
-	public Event getEvent() {
-		return event;
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public Set<Event> getCallbacks() {
+		return callbacks;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(event, getTargetId, sourceId);
+		return Objects.hash(callbacks, events, getTargetId, sourceId);
 	}
 
 	@Override
@@ -37,12 +53,12 @@ public class Transition {
 		if ((obj == null) || (getClass() != obj.getClass()))
 			return false;
 		Transition other = (Transition) obj;
-		return Objects.equals(event, other.event) && getTargetId == other.getTargetId && sourceId == other.sourceId;
+		return Objects.equals(callbacks, other.callbacks) && Objects.equals(events, other.events) && getTargetId == other.getTargetId && sourceId == other.sourceId;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Transition [sourceId=%s, getTargetId=%s, event=%s]", sourceId, getTargetId, event);
+		return String.format("Transition [sourceId=%s, getTargetId=%s, events=%s, callbacks=%s]", sourceId, getTargetId, events, callbacks);
 	}
 
 }

@@ -25,7 +25,6 @@ import br.unb.cic.rvsec.reach.gesda.GesdaReader;
 import br.unb.cic.rvsec.reach.model.Path;
 import br.unb.cic.rvsec.reach.model.RvsecClass;
 import br.unb.cic.rvsec.reach.mop.MopFacade;
-import br.unb.cic.rvsec.reach.writer.JsonWriter;
 import br.unb.cic.rvsec.reach.writer.Writer;
 import br.unb.cic.rvsec.reach.writer.WriterFactory;
 import br.unb.cic.rvsec.reach.writer.WriterType;
@@ -61,26 +60,26 @@ public class Main {
 		infoflow.constructCallgraph();
 
 //		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new TesteReachabilityStrategy();
-		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); //TODO vir como parametro (CLI)
+		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); // TODO vir como parametro (CLI)
 //		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new JGraphReachabilityStrategy();
-		Set<RvsecClass> result = reachabilityAnalysis(appInfo,  mopMethods, entryPoints, analysisStrategy, gesdaFile);
-		
+		Set<RvsecClass> result = reachabilityAnalysis(appInfo, mopMethods, entryPoints, analysisStrategy, gesdaFile);
+
 		writeResults(result, resultsFile, writer);
 	}
 
 	private Set<RvsecClass> reachabilityAnalysis(AppInfo appInfo, Set<SootMethod> mopMethods, Set<SootMethod> entryPoints, ReachabilityStrategy<SootMethod, Path> analysisStrategy, String gesdaFile) throws IOException, XmlPullParserException {
 		ReachabilityAnalysis analysis = new ReachabilityAnalysis(appInfo, mopMethods, entryPoints);
 		Set<RvsecClass> result = analysis.reachabilityAnalysis(analysisStrategy);
-		
+
 		ApkInfoOut apkInfo = GesdaReader.read(gesdaFile);
 		analysis.complementReachabilityAnalysis(result, apkInfo);
-		
+
 		return result;
 	}
-	
+
 	private void writeResults(Set<RvsecClass> result, String resultsFile, Writer writer) {
 		writer.write(result, new File(resultsFile));
-		log.info("Results saved in: "+resultsFile);
+		log.info("Results saved in: " + resultsFile);
 	}
 
 	private Set<SootMethod> getEntrypoints(List<SootClass> activities, AppInfo appInfo) {
@@ -98,17 +97,17 @@ public class Main {
 	}
 
 	private boolean isValidEntrypoint(SootMethod sootMethod, AppInfo appInfo) {
-        return !sootMethod.isConstructor() && !sootMethod.isPrivate();
-    }
-	
+		return !sootMethod.isConstructor() && !sootMethod.isPrivate();
+	}
+
 	private Set<SootMethod> getMopMethods(String mopSpecsDir, AppInfo appInfo) throws MOPException {
 		MopFacade mopFacade = new MopFacade();
 		Set<SootMethod> mopMethods = mopFacade.getMopMethodsUsedInApplicationPackage(mopSpecsDir, appInfo);
+//		Set<SootMethod> mopMethods = mopFacade.getMopMethodsUsedInApk(mopSpecsDir, appInfo);
 		log.info("MOP methods: " + mopMethods.size());
 		mopMethods.forEach(m -> log.debug(" - " + m.getSignature()));
 		return mopMethods;
 	}
-
 
 	private List<SootClass> getActivitiesWithInnerClasses(AppInfo appInfo) {
 		List<SootClass> activities = new ArrayList<>();// all activities'window node
@@ -124,19 +123,19 @@ public class Main {
 		activities.forEach(m -> log.debug(" - " + m.getName()));
 		return activities;
 	}
-	
+
 	public static void main(String[] args) {
 		execute(args);
 	}
 
 	private static void execute(String[] args) {
 		long start = System.currentTimeMillis();
-		
-//		executeTest();
+
 		executeCLI(args);
-		
+//		executeTest();
+
 		long time = System.currentTimeMillis() - start;
-		System.out.println("TEMPO: "+(time/1000)+" sec.");
+		System.out.println("TEMPO: " + (time / 1000) + " sec.");
 	}
 
 	private static void executeCLI(String[] args) {
@@ -173,36 +172,36 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	private static void executeTest() {
-		String mopSpecsDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-mop/src/main/resources";
-
-		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms";
-		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
-
-		String baseDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini/";
-		String apk = baseDir + "cryptoapp.apk";
-
-//		String sourcesAndSinksFile = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-android/rvsec-taint/SourcesAndSinks.txt";
-////		String sinksFile = "";
-//		String callbacksFile = "";
-
-		String gesdaFile = "/home/pedro/tmp/rvsec-gesda.json";
-		
+//	private static void executeTest() {
+//		String mopSpecsDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-mop/src/main/resources/jca";
+//
+//		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms";
+//		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
+//
+//		String baseDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini/";
+//		String apk = baseDir + "cryptoapp.apk";
+//
+////		String sourcesAndSinksFile = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-android/rvsec-taint/SourcesAndSinks.txt";
+//////		String sinksFile = "";
+////		String callbacksFile = "";
+//
+//		String gesdaFile = "/home/pedro/tmp/rvsec-gesda.json";
+//		
 //		Writer writer = new CsvWriter();
 //		String outFile = "/home/pedro/tmp/teste.csv";		
-		Writer writer = new JsonWriter();
-		String outFile = "/home/pedro/tmp/teste.json";
-		
-		Main main = new Main();
-		try {
-			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
+////		Writer writer = new JsonWriter();
+////		String outFile = "/home/pedro/tmp/teste.json";
+//		
+//		Main main = new Main();
+//		try {
+//			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+
 }

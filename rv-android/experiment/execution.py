@@ -7,9 +7,9 @@ from datetime import datetime
 
 import utils
 from app import App
-from constants import EXTENSION_LOGCAT, EXTENSION_TRACE, EXTENSION_METHODS, EXECUTION_MEMORY_FILENAME
+from constants import EXTENSION_LOGCAT, EXTENSION_TRACE, EXTENSION_METHODS, EXECUTION_MEMORY_FILENAME, EXTENSION_GESDA, EXTENSION_GATOR, EXTENSION_REACH
 from experiment.memory import Memory
-from experiment.task import Task
+from experiment.task import Task, TaskStatus
 from settings import *
 from tools.tool_spec import AbstractTool
 
@@ -65,14 +65,8 @@ class ExecutionManager:
 
     def start_task(self, task: Task):
         task.init(self.base_results_dir)
-        task.start_time = datetime.now()
-        # results_dir = os.path.join(self.base_results_dir, task.apk)
-        # task.results_dir = results_dir
         utils.create_folder_if_not_exists(task.results_dir)
         copy_methods_file(task.apk, task.results_dir)
-        # base_name = "{0}__{1}__{2}__{3}".format(task.apk, task.repetition, task.timeout, task.tool)
-        # task.logcat_file = os.path.join(results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))
-        # task.log_file = os.path.join(results_dir, "{}{}".format(base_name, EXTENSION_TRACE))
 
     def finish_task(self, task):
         task.executed = True
@@ -110,10 +104,16 @@ def create_results_dir():
 
 
 def copy_methods_file(apk: str, app_results_dir: str):
-    methods_file_name = apk + EXTENSION_METHODS
-    methods_file = os.path.join(INSTRUMENTED_DIR, methods_file_name)
-    if os.path.exists(methods_file):
-        shutil.copy(methods_file, app_results_dir)
+    extensions = [EXTENSION_METHODS, EXTENSION_GESDA, EXTENSION_GATOR, EXTENSION_REACH]
+    for extension in extensions:
+        file_name = apk + extension
+        file_path = os.path.join(INSTRUMENTED_DIR, file_name)
+        if os.path.exists(file_path):
+            shutil.copy(file_path, app_results_dir)
+    # methods_file_name = apk + EXTENSION_METHODS
+    # methods_file = os.path.join(INSTRUMENTED_DIR, methods_file_name)
+    # if os.path.exists(methods_file):
+    #     shutil.copy(methods_file, app_results_dir)
 
 
 def status(memory_file: str) -> str:
@@ -123,7 +123,8 @@ def status(memory_file: str) -> str:
     executed_tasks = 0
     errors = []
     for task in memory.tasks:
-        if task.executed:
+        if TaskStatus.EXECUTED == task.status:
+        # if task.executed:
             executed_tasks += 1
         if task.error:
             errors.append(f"task={task}, error={task.error}")

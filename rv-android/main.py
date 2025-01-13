@@ -10,7 +10,7 @@ from datetime import datetime
 import utils
 from constants import *
 from experiment import config as experiment_config
-from experiment import experiment_02
+from experiment import experiment_03
 from tools.tool_spec import AbstractTool
 
 available_tools: dict[str, AbstractTool] = {}
@@ -62,7 +62,7 @@ def run_cli():
     logging.info('############# STARTING EXPERIMENT #############')
     start = time.time()
 
-    experiment_02.execute()
+    experiment_03.execute()
 
     end = time.time()
     elapsed = end - start
@@ -237,7 +237,7 @@ def run_local():
     validate_experiment_config()
     print_experiment_config()
 
-    experiment_02.execute()
+    experiment_03.execute()
 
     print("FIM DE FESTA!!!")
 

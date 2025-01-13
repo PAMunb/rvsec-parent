@@ -17,6 +17,7 @@ from settings import LIB_DIR, WORKING_DIR
 from settings import MOP_DIR
 from constants import *
 
+# DEPRECATED: uses androguard ... new version uses a custom implementation using soot
 
 def extract_reachable_methods(apk_path: str, out_file: str):
     reachable = reachable_methods_that_uses_jca(apk_path)

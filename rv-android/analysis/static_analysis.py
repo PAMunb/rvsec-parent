@@ -13,6 +13,13 @@ class StaticAnalysisException(Exception):
     pass
 
 
+def run_static_analysis(app: App, gesda_file: str, gator_file: str, reach_file: str):
+    logging.info(f"Running static analysis on: {app.name}")
+    run_gesda(app, gesda_file)
+    run_gator(app, gator_file)
+    run_reachability(app, reach_file, MOP_DIR, gesda_file)
+
+
 def run_gesda(app: App, gesda_file: str):
     gesda_jar = os.path.join(LIB_DIR, "gesda", "rvsec-gesda.jar")
     gesda_cmd = Command("java", [
@@ -49,6 +56,29 @@ def run_gator(app: App, gator_file: str):
     __run(app, gator_file, "GATOR", gator_cmd)
 
 
+def run_reachability(app: App, reach_file: str, mop_dir: str, gesda_file: str=None):
+    reach_jar = os.path.join(LIB_DIR, "reach", "rvsec-reach.jar")
+    reach_cmd = Command("java", [
+        "-jar",
+        reach_jar,
+        "--android-dir",
+        ANDROID_PLATFORMS_DIR,
+        "--mop-dir",
+        mop_dir,
+        "--rt-jar",
+        RT_JAR,
+        "--output",
+        reach_file,
+        "--gesda",
+        gesda_file,
+        "--writer",
+        "csv",
+        "--apk",
+        app.path
+    ])
+    __run(app, reach_file, "REACHABILITY", reach_cmd)
+
+
 def __run(app: App, result_file: str, name: str, command: Command):
     if os.path.isfile(result_file):
         logging.info("Skipping APK already analyzed with {}: {}".format(name, app.name))
@@ -58,7 +88,3 @@ def __run(app: App, result_file: str, name: str, command: Command):
     if cmd_result.code != 0:
         raise StaticAnalysisException("Error while executing {0}: {1}. {2}".format(name, cmd_result.code,
                                                                                    cmd_result.stderr))
-
-
-def run_reachability():
-    pass

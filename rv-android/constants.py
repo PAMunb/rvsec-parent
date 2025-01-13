@@ -11,6 +11,7 @@ EXTENSION_RVM = ".rvm"
 EXTENSION_LOGCAT = ".logcat"
 EXTENSION_TRACE = ".trace"
 EXTENSION_METHODS = ".methods"
+EXTENSION_REACH = ".reach"
 EXTENSION_GESDA = ".gesda"
 EXTENSION_GATOR = ".wtg"
 

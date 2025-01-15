@@ -1,8 +1,10 @@
 package br.unb.cic.rvsec.reach.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import soot.SootMethod;
@@ -21,6 +23,8 @@ public class RvsecMethod {
 	// true if directly calls a MOP method
 	// false if the MOP method is reached by a library/system
 	private boolean directlyReachesMop = false;
+
+	private Set<String> mopMethodsReached = new HashSet<>();
 
 	// one of the possible paths (from an endpoint and this method)
 	private Path possiblePath;
@@ -67,6 +71,10 @@ public class RvsecMethod {
 		return directlyReachesMop;
 	}
 
+	public Set<String> getMopMethodsReached() {
+		return mopMethodsReached;
+	}
+
 	public void setReachable(boolean reachable) {
 		this.reachable = reachable;
 	}
@@ -90,15 +98,19 @@ public class RvsecMethod {
 	public List<Path> getPossiblePathToMop() {
 		return possiblePathToMop;
 	}
-	
+
 	public void addPathToMop(Path path) {
 		possiblePathToMop.add(path);
 	}
-	
+
 	private String allPathsToMop() {
 		return possiblePathToMop.stream()
 			.map(p -> "path=["+p+"]")
 			.collect(Collectors.joining(", "));
+	}
+
+	public void addMopMethodReached(String mopMethod) {
+		mopMethodsReached.add(mopMethod);
 	}
 
 	@Override
@@ -117,17 +129,10 @@ public class RvsecMethod {
 				&& Objects.equals(possiblePath, other.possiblePath) && Objects.equals(possiblePathToMop, other.possiblePathToMop) && reachable == other.reachable && reachesMop == other.reachesMop;
 	}
 
-//	@Override
-//	public String toString() {
-//		return String.format("RvsecMethod [methodName=%s, reachable=%s, reachesMop=%s, directlyReachesMop=%s]", methodName, reachable, reachesMop, directlyReachesMop);
-//	}
-
 	@Override
 	public String toString() {
 		return String.format("RvsecMethod [methodName=%s, methodSignature=%s, modifiers=%s, reachable=%s, reachesMop=%s, directlyReachesMop=%s, possiblePath=%s, possiblePathToMop=%s]", methodName, methodSignature, modifiers, reachable, reachesMop,
 				directlyReachesMop, possiblePath, allPathsToMop());
 	}
-	
 
-	
 }

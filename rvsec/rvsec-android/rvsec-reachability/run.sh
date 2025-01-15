@@ -10,4 +10,4 @@ WRITER="json"
 #WRITER="csv"
 
 echo "[+] Executing ..."
-java -jar target/rvsec-reach-jar-with-dependencies.jar --android-dir $ANDROID_PLATFORMS_DIR --mop-dir $MOP_SPECS_DIR --rt-jar $RT_JAR --output $OUT --gesda $GESDA_FILE --writer $WRITER --apk $APK
+java -jar target/rvsec-reach.jar --android-dir $ANDROID_PLATFORMS_DIR --mop-dir $MOP_SPECS_DIR --rt-jar $RT_JAR --output $OUT --gesda $GESDA_FILE --writer $WRITER --apk $APK

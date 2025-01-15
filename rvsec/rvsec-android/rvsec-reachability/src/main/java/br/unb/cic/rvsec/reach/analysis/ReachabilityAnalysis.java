@@ -46,7 +46,7 @@ public class ReachabilityAnalysis {
 
 		this.analysisStrategy = strategy;
 		analysisStrategy.initialize(Scene.v().getCallGraph(), appInfo);
-		
+
 		// All reachable methods (from an entrypoint)
 		Map<SootMethod, Path> reachableMethods = getReachableMethods(entryPoints);
 
@@ -81,7 +81,7 @@ public class ReachabilityAnalysis {
 		processActivityLifecycleCallbacks(result);
 	}
 
-	private void processGesdaResults(Set<RvsecClass> result, ApkInfoOut apkInfo) {		
+	private void processGesdaResults(Set<RvsecClass> result, ApkInfoOut apkInfo) {
 		if (apkInfo == null) {
 			return;
 		}
@@ -104,14 +104,14 @@ public class ReachabilityAnalysis {
 					if (method != null) {
 						method.setReachable(true);
 						log.debug("reachable: " + method.getMethodSignature());
-					} 
+					}
 				}
 			}
 		}
 	}
 
 	private void processActivityLifecycleCallbacks(Set<RvsecClass> result) {
-		List<String> activityLifecycleMethods = List.of("onCreate", "onStart", "onResume", 
+		List<String> activityLifecycleMethods = List.of("onCreate", "onStart", "onResume",
 				"onPause", "onStop", "onDestroy", "onSaveInstanceState", "onRestoreInstanceState");
 		for (RvsecClass clazz : result) {
 			for (RvsecMethod method : clazz.getMethods()) {
@@ -153,6 +153,7 @@ public class ReachabilityAnalysis {
 				boolean isSuccessor = analysisStrategy.isSuccessor(sootMethod, mopMethod);
 				if (isSuccessor) {
 					method.setDirectlyReachesMop(true);
+					method.addMopMethodReached(mopMethod.getSignature());
 				}
 				method.setReachesMop(true);
 				method.addPathToMop(pathOpt.get());

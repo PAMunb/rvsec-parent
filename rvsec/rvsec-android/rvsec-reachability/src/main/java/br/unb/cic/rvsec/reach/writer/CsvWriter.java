@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +20,11 @@ public class CsvWriter implements Writer {
     public void write(Set<RvsecClass> result, File out) {
         log.info("Saving results in: "+out.getAbsolutePath());
         try (PrintWriter pw = new PrintWriter(new FileWriter(out))) {
-            pw.println("className,isActivity,isMainActivity,methodName,reachable,reachesMop,directlyReachesMop,signature");
+            pw.println("className,isActivity,isMainActivity,methodName,reachable,reachesMop,directlyReachesMop,signature,mopMethodsReached");
             for (RvsecClass clazz : result) {
                 for (RvsecMethod method : clazz.getMethods()) {
-                    pw.println(String.format("%s,%b,%b,%s,%b,%b,%b,\"%s\"",
+                	String mopMethodsReached = "["+method.getMopMethodsReached().stream().collect(Collectors.joining(";"))+"]";
+                    pw.println(String.format("%s,%b,%b,%s,%b,%b,%b,\"%s\",\"%s\"",
                             clazz.getClassName(),
                             clazz.isActivity(),
                             clazz.isMainActivity(),
@@ -30,7 +32,8 @@ public class CsvWriter implements Writer {
                             method.isReachable(),
                             method.isReachesMop(),
                             method.isDirectlyReachesMop(),
-                            method.getMethodSignature()));
+                            method.getMethodSignature(),
+                    		mopMethodsReached));
                 }
             }
         } catch (IOException e) {

@@ -8,7 +8,7 @@ import br.unb.cic.rvsec.reach.writer.WriterType;
 
 public class CommandLineArgs {
 
-	@Parameter(names = { "--android-dir", "-d" }, description = "Android platforms path (~/Android/sdk/platforms). Default: $ANDROID_HOME") // , required = true)
+	@Parameter(names = { "--android-dir", "-d" }, description = "Android platforms path (~/Android/sdk/platforms). Default: $ANDROID_HOME")
 	private String androidDir;
 
 	@Parameter(names = { "--mop-dir", "-m" }, description = "MOP specifications path", required = true)
@@ -29,10 +29,15 @@ public class CommandLineArgs {
 	@Parameter(names = { "--writer", "-w" }, description = "Output file type: csv or json. Default: csv")
 	private WriterType writerType = WriterType.csv;
 
+	@Parameter(names = { "--full", "-f" },
+			description = "Performs analysis on all methods contained in the apk. The default analysis only analyzes the methods of classes contained in the package declared in the manifest. Default: false",
+			required = false)
+	private boolean full = false;
+
 	@Parameter(names = "-debug", description = "Debug mode")
 	private boolean debug = false;
 
-	
+
 	public CommandLineArgs() {
 		String androidHome = System.getenv("ANDROID_HOME");
 		if (androidHome != null) {
@@ -62,6 +67,10 @@ public class CommandLineArgs {
 
 	public String getApk() {
 		return apk;
+	}
+
+	public boolean isFull() {
+		return full;
 	}
 
 	public boolean isDebug() {

@@ -21,70 +21,61 @@ import soot.jimple.Stmt;
 
 public class MopFacade {
 	private static final Logger log = LoggerFactory.getLogger(MopFacade.class);
-	
-	@Deprecated
-	public Set<SootMethod> getMopMethodsUsedInApplicationPackage(String mopSpecsDir, AppInfo apkInfo) throws MOPException {
-		log.info("Retrieving MOP methods used in application package ...");
-		Set<SootMethod> sootMopMethods = new HashSet<>();
 
-		JavamopFacade javamopFacade = new JavamopFacade();
-		Set<MopMethod> mopMethods = javamopFacade.listUsedMethods(mopSpecsDir, false);
+	private JavamopFacade javamopFacade = new JavamopFacade();
 
-		for (SootClass c : Scene.v().getApplicationClasses()) {
-			if (AndroidUtil.isClassInApplicationPackage(c, apkInfo)) {
-				for (SootMethod m : c.getMethods()) {
-					UnitPatchingChain units = m.retrieveActiveBody().getUnits();
-                    for (Unit unit : units) {
-                        Stmt stmt = (Stmt) unit;
-                        if (stmt.containsInvokeExpr()) {
-                            InvokeExpr invokeExpr = stmt.getInvokeExpr();
-                            if (isMop(invokeExpr, mopMethods)) {
-                                sootMopMethods.add(invokeExpr.getMethod());
-                            }
-                        }
-                    }
-				}
-			}
-		}
-
-		return sootMopMethods;
+	public Set<SootMethod> getMopMethodsUsed(String mopSpecsDir, AppInfo apkInfo) throws MOPException {
+		return getMopMethodsUsed(mopSpecsDir, apkInfo, true);
 	}
-	
-	public Set<SootMethod> getMopMethodsUsedInApk(String mopSpecsDir, AppInfo apkInfo) throws MOPException {
-		log.info("Retrieving MOP methods used in APK ...");
-		Set<SootMethod> sootMopMethods = new HashSet<>();
 
-		JavamopFacade javamopFacade = new JavamopFacade();
-		Set<MopMethod> mopMethods = javamopFacade.listUsedMethods(mopSpecsDir, false);
+	public Set<SootMethod> getMopMethodsUsed(String mopSpecsDir, AppInfo apkInfo, boolean checkOnlyInAppPackage) throws MOPException {
+	    log.info("Retrieving MOP methods used ...");
+	    log.debug("Check only in application package? "+checkOnlyInAppPackage);
 
-		for (SootClass c : Scene.v().getApplicationClasses()) {
-//			if (AndroidUtil.isClassInApplicationPackage(c, apkInfo)) {
-				for (SootMethod m : c.getMethods()) {
-					UnitPatchingChain units = m.retrieveActiveBody().getUnits();
-                    for (Unit unit : units) {
-                        Stmt stmt = (Stmt) unit;
-                        if (stmt.containsInvokeExpr()) {
-                            InvokeExpr invokeExpr = stmt.getInvokeExpr();
-                            if (isMop(invokeExpr, mopMethods)) {
-                                sootMopMethods.add(invokeExpr.getMethod());
-                            }
-                        }
-                    }
-				}
-//			}
-		}
+	    Set<SootMethod> sootMopMethods = new HashSet<>();
 
-		return sootMopMethods;
+	    Set<MopMethod> mopMethods = javamopFacade.listUsedMethods(mopSpecsDir, false);
+
+	    for (SootClass c : Scene.v().getApplicationClasses()) {
+	        if (checkOnlyInAppPackage && !AndroidUtil.isClassInApplicationPackage(c, apkInfo)) {
+	            continue;
+	        }
+	        for (SootMethod m : c.getMethods()) {
+	            sootMopMethods.addAll(findMopMethodsInMethod(m, mopMethods));
+	        }
+	    }
+
+	    return sootMopMethods;
 	}
-	
+
+	private Set<SootMethod> findMopMethodsInMethod(SootMethod m, Set<MopMethod> mopMethods) {
+	    Set<SootMethod> mopMethodsInMethod = new HashSet<>();
+	    if (!m.isConcrete()) {
+            return mopMethodsInMethod;
+        }
+		UnitPatchingChain units = m.retrieveActiveBody().getUnits();
+	    for (Unit unit : units) {
+	        Stmt stmt = (Stmt) unit;
+	        if (stmt.containsInvokeExpr()) {
+	            InvokeExpr invokeExpr = stmt.getInvokeExpr();
+	            if (isMop(invokeExpr, mopMethods)) {
+	                mopMethodsInMethod.add(invokeExpr.getMethod());
+	            }
+	        }
+	    }
+	    return mopMethodsInMethod;
+	}
+
 	private boolean isMop(InvokeExpr invokeExpr, Set<MopMethod> mopMethods) {
 		SootMethod invokeMethod = invokeExpr.getMethod();
-		for (MopMethod mopMethod : mopMethods) {			
-			if (mopMethod.getClassName().equals(invokeMethod.getDeclaringClass().getName()) 
+		for (MopMethod mopMethod : mopMethods) {
+			//TODO testar/comparar assinatura completa
+			if (mopMethod.getClassName().equals(invokeMethod.getDeclaringClass().getName())
 					&& mopMethod.getName().equals(invokeMethod.getName())) {
 				return true;
 			}
 		}
 		return false;
 	}
+
 }

@@ -17,14 +17,15 @@ import com.fdu.se.sootanalyze.model.out.ApkInfoOut;
 import br.unb.cic.rvsec.apk.model.ActivityInfo;
 import br.unb.cic.rvsec.apk.model.AppInfo;
 import br.unb.cic.rvsec.apk.reader.AppReader;
+import br.unb.cic.rvsec.reach.analysis.JGraphReachabilityStrategy;
 import br.unb.cic.rvsec.reach.analysis.ReachabilityAnalysis;
 import br.unb.cic.rvsec.reach.analysis.ReachabilityStrategy;
-import br.unb.cic.rvsec.reach.analysis.SootReachabilityStrategy;
 import br.unb.cic.rvsec.reach.cli.CommandLineArgs;
 import br.unb.cic.rvsec.reach.gesda.GesdaReader;
 import br.unb.cic.rvsec.reach.model.Path;
 import br.unb.cic.rvsec.reach.model.RvsecClass;
 import br.unb.cic.rvsec.reach.mop.MopFacade;
+import br.unb.cic.rvsec.reach.writer.CsvWriter;
 import br.unb.cic.rvsec.reach.writer.Writer;
 import br.unb.cic.rvsec.reach.writer.WriterFactory;
 import br.unb.cic.rvsec.reach.writer.WriterType;
@@ -37,41 +38,59 @@ import soot.jimple.infoflow.android.SetupApplication;
 public class Main {
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	public void execute(String apkPath, String mopSpecsDir, String androidPlatformsDir, String rtJarPath, String resultsFile, String gesdaFile, Writer writer) throws Exception {
+	public void execute(String apkPath, String mopSpecsDir, String androidPlatformsDir, String rtJarPath, String resultsFile, String gesdaFile, Writer writer, boolean checkOnlyInAppPackage) throws Exception {
 		log.info("Executing ...");
 
-		// get some application info
+		// get application info
 		AppInfo appInfo = AppReader.readApk(apkPath);
 		log.info("App info: " + appInfo);
 
 		// initialize soot (infoflow)
 		SetupApplication infoflow = SootConfig.initialize(apkPath, androidPlatformsDir, rtJarPath);
 
-		// methods used in MOP specifications
-		Set<SootMethod> mopMethods = getMopMethods(mopSpecsDir, appInfo);
+		// methods used in MOP specifications that are called in apk/package
+		Set<SootMethod> mopMethods = getMopMethods(mopSpecsDir, appInfo, checkOnlyInAppPackage);
 
 		// the list of all activities (with inner classes)
 		List<SootClass> activities = getActivitiesWithInnerClasses(appInfo);
 
-		// Entrypoints: methods (public or protected) of each activity
+		// Entrypoints: set of methods (public or protected) of each activity
 		Set<SootMethod> entryPoints = getEntrypoints(activities, appInfo);
 
 		log.info("Constructing callgraph ...");
 		infoflow.constructCallgraph();
 
-//		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new TesteReachabilityStrategy();
-		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); // TODO vir como parametro (CLI)
-//		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new JGraphReachabilityStrategy();
+//		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); // TODO vir como parametro (CLI)
+		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new JGraphReachabilityStrategy();
 		Set<RvsecClass> result = reachabilityAnalysis(appInfo, mopMethods, entryPoints, analysisStrategy, gesdaFile);
 
 		writeResults(result, resultsFile, writer);
 	}
 
-	private Set<RvsecClass> reachabilityAnalysis(AppInfo appInfo, Set<SootMethod> mopMethods, Set<SootMethod> entryPoints, ReachabilityStrategy<SootMethod, Path> analysisStrategy, String gesdaFile) throws IOException, XmlPullParserException {
+	private Set<RvsecClass> reachabilityAnalysis(AppInfo appInfo, Set<SootMethod> mopMethods, Set<SootMethod> entryPoints, ReachabilityStrategy<SootMethod, Path> analysisStrategy,
+			String gesdaFile) throws IOException, XmlPullParserException {
+
+//		System.out.println("*************************************");
+//		ReachableMethods reachableMethods = Scene.v().getReachableMethods();
+//		QueueReader<MethodOrMethodContext> listener = reachableMethods.listener();
+//		while (listener.hasNext()) {
+//			MethodOrMethodContext next = listener.next();
+//			SootMethod method = next.method();
+//			if (method.getDeclaringClass().getPackageName().contains(appInfo.getPackage())
+//					|| method.getDeclaringClass().getPackageName().contains("java.security")) {
+//				System.out.println(next.method().getSignature());
+//			}
+//		}
+//		System.out.println("************************************* FIM");
+
 		ReachabilityAnalysis analysis = new ReachabilityAnalysis(appInfo, mopMethods, entryPoints);
 		Set<RvsecClass> result = analysis.reachabilityAnalysis(analysisStrategy);
 
+		if (gesdaFile == null) {
+			return result;
+		}
 		ApkInfoOut apkInfo = GesdaReader.read(gesdaFile);
+
 		analysis.complementReachabilityAnalysis(result, apkInfo);
 
 		return result;
@@ -97,13 +116,12 @@ public class Main {
 	}
 
 	private boolean isValidEntrypoint(SootMethod sootMethod, AppInfo appInfo) {
-		return !sootMethod.isConstructor() && !sootMethod.isPrivate();
+		return sootMethod.isConcrete() && !sootMethod.isConstructor() && !sootMethod.isPrivate();
 	}
 
-	private Set<SootMethod> getMopMethods(String mopSpecsDir, AppInfo appInfo) throws MOPException {
+	private Set<SootMethod> getMopMethods(String mopSpecsDir, AppInfo appInfo, boolean checkOnlyInAppPackage) throws MOPException {
 		MopFacade mopFacade = new MopFacade();
-		Set<SootMethod> mopMethods = mopFacade.getMopMethodsUsedInApplicationPackage(mopSpecsDir, appInfo);
-//		Set<SootMethod> mopMethods = mopFacade.getMopMethodsUsedInApk(mopSpecsDir, appInfo);
+		Set<SootMethod> mopMethods = mopFacade.getMopMethodsUsed(mopSpecsDir, appInfo, checkOnlyInAppPackage);
 		log.info("MOP methods: " + mopMethods.size());
 		mopMethods.forEach(m -> log.debug(" - " + m.getSignature()));
 		return mopMethods;
@@ -135,7 +153,7 @@ public class Main {
 //		executeTest();
 
 		long time = System.currentTimeMillis() - start;
-		System.out.println("TEMPO: " + (time / 1000) + " sec.");
+		System.out.println("TIME: " + (time / 1000) + " sec.");
 	}
 
 	private static void executeCLI(String[] args) {
@@ -155,6 +173,7 @@ public class Main {
 		String apk = jArgs.getApk();
 		String outputFile = jArgs.getOutputFile();
 		String gesdaFile = jArgs.getGesdaFile();
+		boolean checkOnlyInAppPackage = !jArgs.isFull();
 		boolean debug = jArgs.isDebug();
 		WriterType writerType = jArgs.getWriterType();
 		Writer writer = WriterFactory.fromType(writerType);
@@ -167,7 +186,7 @@ public class Main {
 		log.info("Starting analysis ...");
 		Main main = new Main();
 		try {
-			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outputFile, gesdaFile, writer);
+			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outputFile, gesdaFile, writer, checkOnlyInAppPackage);
 			log.info("Analysis completed");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -175,33 +194,72 @@ public class Main {
 
 	}
 
-//	private static void executeTest() {
-//		String mopSpecsDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-mop/src/main/resources/jca";
-//
-//		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms";
-//		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
-//
-//		String baseDir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini/";
-//		String apk = baseDir + "cryptoapp.apk";
-//
-////		String sourcesAndSinksFile = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-android/rvsec-taint/SourcesAndSinks.txt";
-//////		String sinksFile = "";
-////		String callbacksFile = "";
-//
-//		String gesdaFile = "/home/pedro/tmp/rvsec-gesda.json";
-//		
-//		Writer writer = new CsvWriter();
-//		String outFile = "/home/pedro/tmp/teste.csv";		
-////		Writer writer = new JsonWriter();
-////		String outFile = "/home/pedro/tmp/teste.json";
-//		
-//		Main main = new Main();
-//		try {
-//			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+	private static void executeTest() {
+		String rvsecDir = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec";
+		String mopSpecsDir = rvsecDir + "/rvsec/rvsec-mop/src/main/resources/jca";
+		String apksDir = rvsecDir + "/rv-android/apks_exp02/";
+
+		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/platforms";
+//		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/platforms-sable";
+		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
+
+		String apk = apksDir + "cryptoapp.apk";
+//		String apk = apksDir + "com.blogspot.e_kanivets.moneytracker_38.apk";
+//		String apk = apksDir + "com.gianlu.dnshero_40.apk";
+//		String apk = apksDir + "com.github.axet.hourlyreminder_476.apk";
+//		String apk = apksDir + "com.pindroid_69.apk";
+//		String apk = apksDir + "com.rafapps.simplenotes_7.apk";
+//		String apk = apksDir + "com.thibaudperso.sonycamera_24.apk";
+//		String apk = apksDir + "li.klass.fhem_141.apk";
+//		String apk = apksDir + "org.pulpdust.lesserpad_42.apk";
+//		String apk = apksDir + "org.secuso.privacyfriendlydicer_8.apk";
+//		String apk = apksDir + "org.secuso.privacyfriendlyludo_5.apk";
+
+		String gesdaFile = null;
+		boolean checkOnlyInAppPackage = false;
+
+		Writer writer = new CsvWriter();
+		String outFile = "/home/pedro/tmp/teste.csv";
+//		Writer writer = new JsonWriter();
+//		String outFile = "/home/pedro/tmp/teste.json";
+
+		Main main = new Main();
+		try {
+			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+//		try (Stream<java.nio.file.Path> paths = Files.walk(java.nio.file.Path.of(apksDir))) {
+//			Main main = new Main();
+//            List<java.nio.file.Path> apks = paths.filter(path -> path.toString().endsWith(".apk")).collect(Collectors.toList());
+//			for (java.nio.file.Path path : apks) {
+//				apk = path.toAbsolutePath().toString();
+//				System.out.println("\n\n\n ************************************* APK: "+apk);
+//				outFile = String.format("/home/pedro/tmp/teste_%s.csv", path.getFileName().toString());
+//				try {
+//					main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+
+	}
+
+//	com.blogspot.e_kanivets.moneytracker_38.apk
+//	com.gianlu.dnshero_40.apk
+//	com.github.axet.hourlyreminder_476.apk
+//	com.pindroid_69.apk
+//	com.rafapps.simplenotes_7.apk
+//	com.thibaudperso.sonycamera_24.apk
+//	li.klass.fhem_141.apk
+//	org.pulpdust.lesserpad_42.apk
+//	org.secuso.privacyfriendlydicer_8.apk
+//	org.secuso.privacyfriendlyludo_5.apk
 
 }

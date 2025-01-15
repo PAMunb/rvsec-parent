@@ -14,10 +14,6 @@ public class Path {
 		this.path = path.stream().map(SootMethod::getSignature).collect(Collectors.toList());
 	}
 
-//	private boolean isValid(List<SootMethod> pathToCheck) {
-//		return pathToCheck != null && pathToCheck.size() > 1;
-//	}
-
 	public List<String> getPath() {
 		return path;
 	}

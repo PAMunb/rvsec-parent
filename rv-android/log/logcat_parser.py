@@ -102,6 +102,9 @@ def __parse_error_generic_spec(log_line):
 def __to_datetime(date: str, time: str) -> datetime:
     # date: MONTH-DAY (logcat threadtime tag does not print year)
     year = datetime.now().year
+    # TODO remover depois de gerar as planilhas
+    if year == 2025:
+        year = 2024
     # %f = microseconds (6 digits)
     date_format = "%Y-%m-%d %H:%M:%S.%f"
     date_str = f"{year}-{date} {time}"

@@ -60,6 +60,10 @@ class RvCoverage:
         self.time_occurred: datetime = datetime.now()
         self.time_since_task_start: int = 0  # in seconds
 
+    def signature(self):
+        return "{}.{}{}" \
+            .format(self.clazz, self.method, self.params)
+
     def __str__(self):
         return f"RvCoverage(clazz={self.clazz}, method={self.method}, params={self.params}, time_occurred={self.time_occurred}, time_since_task_start={self.time_since_task_start})"
 

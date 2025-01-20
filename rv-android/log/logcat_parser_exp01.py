@@ -38,6 +38,7 @@ def find_sixth_comma(text: str):
 def parse_logcat_file(log_file: str):
     called_methods: dict[str, list[RvCoverage]] = {}
     rvsec_errors: list[RvError] = []
+    methods: list[RvCoverage] = []
 
     handled_errors: set[str] = set()
     tmp = {}
@@ -63,7 +64,9 @@ def parse_logcat_file(log_file: str):
                         continue
                     tmp[cov.clazz].add(cov.unique_msg)
                     called_methods[cov.clazz].append(cov)
-    return rvsec_errors, called_methods
+                    methods.append(cov)
+    ordered_methods = sorted(methods, key=lambda x: x.time_occurred)
+    return rvsec_errors, called_methods, ordered_methods
 
 
 def __get_tag(line: str):

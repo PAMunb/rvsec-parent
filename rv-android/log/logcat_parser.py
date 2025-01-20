@@ -7,7 +7,8 @@ from constants import *
 
 def parse_logcat_file(log_file: str):
     called_methods: dict[str, dict[str, dict[str, RvCoverage]]] = {}
-    rvsec_error_msgs = set()
+    methods: list[RvCoverage] = []
+    rvsec_error_msgs: set[str] = set()
     errors: list[RvError] = []
     for entry in __parse_logcat(log_file):
         message = entry["message"]
@@ -28,6 +29,7 @@ def parse_logcat_file(log_file: str):
                 cov.time_occurred = date
                 cov.original_msg = entry["original"]
                 called_methods[cov.clazz][METHODS][cov.method] = cov
+                methods.append(cov)
                 #     {
                 #     # "date": utils.datetime_to_milliseconds(date),
                 #     "date": date,
@@ -36,7 +38,8 @@ def parse_logcat_file(log_file: str):
                 # }
             # called_methods[clazz].add(sig)
             # called_methods[clazz].add(method)
-    return errors, called_methods
+    ordered_methods = sorted(methods, key=lambda x: x.time_occurred)
+    return errors, called_methods, ordered_methods
 
 
 def __parse_logcat(log_file: str):

@@ -20,9 +20,6 @@ class RvError:
         self.time_occurred: datetime = datetime.now()
         self.time_since_task_start: int = 0  # in seconds
 
-    def __str__(self):
-        return f"RvError(spec={self.spec}, type={self.error_type}, classFullName={self.class_full_name}, method={self.method}, message={self.message}, time_occurred={self.time_occurred}, time_since_task_start={self.time_since_task_start})"
-
     def to_json(self):
         return {
             'spec': self.spec,
@@ -40,6 +37,15 @@ class RvError:
     @classmethod
     def from_json(cls, data):
         return cls(**data)
+
+    def __str__(self):
+        return f"RvError(spec={self.spec}, type={self.error_type}, classFullName={self.class_full_name}, method={self.method}, message={self.message}, time_occurred={self.time_occurred}, time_since_task_start={self.time_since_task_start})"
+
+    def __repr__(self):
+        return f"{self.unique_msg}:{self.time_occurred}"
+
+    def __hash__(self):
+        return hash(self.unique_msg)
 
     def __eq__(self, other):
         if not isinstance(other, RvError):
@@ -60,12 +66,19 @@ class RvCoverage:
         self.time_occurred: datetime = datetime.now()
         self.time_since_task_start: int = 0  # in seconds
 
+    @property
     def signature(self):
         return "{}.{}{}" \
             .format(self.clazz, self.method, self.params)
 
     def __str__(self):
         return f"RvCoverage(clazz={self.clazz}, method={self.method}, params={self.params}, time_occurred={self.time_occurred}, time_since_task_start={self.time_since_task_start})"
+
+    def __repr__(self):
+        return f"{self.unique_msg}:{self.time_occurred}"
+
+    def __hash__(self):
+        return hash(self.unique_msg)
 
     def __eq__(self, other):
         if not isinstance(other, RvCoverage):

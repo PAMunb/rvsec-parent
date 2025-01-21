@@ -10,29 +10,42 @@ import soot.G;
 import soot.Scene;
 import soot.jimple.infoflow.InfoflowConfiguration;
 import soot.jimple.infoflow.android.InfoflowAndroidConfiguration;
+import soot.jimple.infoflow.android.InfoflowAndroidConfiguration.CallbackAnalyzer;
 import soot.jimple.infoflow.android.SetupApplication;
 import soot.options.Options;
 
 public class SootConfig {
 	private static final Logger log = LoggerFactory.getLogger(SootConfig.class);
-
+	private static final int TIMEOUT_5_MIN = 60*5;	
 	private static InfoflowAndroidConfiguration config;
-
+	
+	
 	public static SetupApplication initialize(String apk, String androiPlatformsDir, String rtJarPath) {
+		return initialize(apk, androiPlatformsDir, rtJarPath, TIMEOUT_5_MIN);
+	}
+	
+	public static SetupApplication initialize(String apk, String androiPlatformsDir, String rtJarPath, int timeout) {
 		initializeSoot(apk, androiPlatformsDir, rtJarPath);
 
 		config = new InfoflowAndroidConfiguration();
 		config.getAnalysisFileConfig().setTargetAPKFile(apk);
 //		config.getAnalysisFileConfig().setAdditionalClasspath(rtJarPath);
-		config.getAnalysisFileConfig().setAndroidPlatformDir(androiPlatformsDir);
-//		config.getCallbackConfig().setEnableCallbacks(false);
+		config.getAnalysisFileConfig().setAndroidPlatformDir(androiPlatformsDir);		
+		config.getCallbackConfig().setEnableCallbacks(true);
+		config.getCallbackConfig().setCallbackAnalyzer(CallbackAnalyzer.Default);
+		config.getCallbackConfig().setCallbackAnalysisTimeout(timeout);
+		config.getCallbackConfig().setMaxAnalysisCallbackDepth(10);		
 		config.setCodeEliminationMode(InfoflowConfiguration.CodeEliminationMode.NoCodeElimination);
 		config.setCallgraphAlgorithm(InfoflowConfiguration.CallgraphAlgorithm.SPARK);
 		config.setMergeDexFiles(true);
+		config.setEnableTypeChecking(true);
 		config.setEnableReflection(true);
 		config.setEnableOriginalNames(true);
 		config.setEnableLineNumbers(true);
-//		config.setTaintAnalysisEnabled(false);
+		config.setTaintAnalysisEnabled(false);
+		config.setDataFlowTimeout(timeout);
+		config.setMaxThreadNum(32);
+//		config.setMemoryThreshold(0.9d);		
 		config.setSootIntegrationMode(InfoflowAndroidConfiguration.SootIntegrationMode.UseExistingInstance);
 
 		log.debug("Creating soot.jimple.infoflow.android.SetupApplication");
@@ -48,14 +61,15 @@ public class SootConfig {
 		log.trace("APK: "+apk);
 		log.trace("Android platforms dir: "+androidPlatformsDir);
 		log.trace("RT jar: "+rtJarPath);
+		
 		G.reset();
 		Options.v().set_full_resolver(true);
 		Options.v().set_allow_phantom_refs(true);
 		Options.v().set_prepend_classpath(true);
 		Options.v().set_validate(true);
-//		Options.v().set_output_format(Options.output_format_none);
+		Options.v().set_output_format(Options.output_format_none);
 
-		Options.v().set_output_format(Options.output_format_jimple);
+//		Options.v().set_output_format(Options.output_format_jimple);
 //		Options.v().set_output_dir("/home/pedro/tmp/cryptoapp_jimple");
 
 		Options.v().set_process_dir(Collections.singletonList(apk));
@@ -66,7 +80,7 @@ public class SootConfig {
 
 //		Options.v().parse(new String[]{"-keep-line-number", "-p", "jb", "use-original-names:true"});
 //		Options.v().parse(new String[]{"-keep-line-number"});
-		Options.v().keep_line_number();
+//		Options.v().set_keep_line_number(true);
 
 		//TODO quando habilita use-original-names: UnitThrowAnalysis StmtSwitch: type of throw argument is not a RefType!
 //		Options.v().parse(new String[]{"-p", "jb", "use-original-names:true"});

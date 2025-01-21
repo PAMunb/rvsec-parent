@@ -38,7 +38,7 @@ import soot.jimple.infoflow.android.SetupApplication;
 public class Main {
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	public void execute(String apkPath, String mopSpecsDir, String androidPlatformsDir, String rtJarPath, String resultsFile, String gesdaFile, Writer writer, boolean checkOnlyInAppPackage) throws Exception {
+	public void execute(String apkPath, String mopSpecsDir, String androidPlatformsDir, String rtJarPath, String resultsFile, String gesdaFile, Writer writer, boolean checkOnlyInAppPackage, int timeout) throws Exception {
 		log.info("Executing ...");
 
 		// get application info
@@ -46,7 +46,7 @@ public class Main {
 		log.info("App info: " + appInfo);
 
 		// initialize soot (infoflow)
-		SetupApplication infoflow = SootConfig.initialize(apkPath, androidPlatformsDir, rtJarPath);
+		SetupApplication infoflow = SootConfig.initialize(apkPath, androidPlatformsDir, rtJarPath, timeout);
 
 		// methods used in MOP specifications that are called in apk/package
 		Set<SootMethod> mopMethods = getMopMethods(mopSpecsDir, appInfo, checkOnlyInAppPackage);
@@ -149,8 +149,8 @@ public class Main {
 	private static void execute(String[] args) {
 		long start = System.currentTimeMillis();
 
-		executeCLI(args);
-//		executeTest();
+//		executeCLI(args);
+		executeTest();
 
 		long time = System.currentTimeMillis() - start;
 		System.out.println("TIME: " + (time / 1000) + " sec.");
@@ -173,6 +173,7 @@ public class Main {
 		String apk = jArgs.getApk();
 		String outputFile = jArgs.getOutputFile();
 		String gesdaFile = jArgs.getGesdaFile();
+		int timeout = jArgs.getTimeout();
 		boolean checkOnlyInAppPackage = !jArgs.isFull();
 		boolean debug = jArgs.isDebug();
 		WriterType writerType = jArgs.getWriterType();
@@ -186,7 +187,7 @@ public class Main {
 		log.info("Starting analysis ...");
 		Main main = new Main();
 		try {
-			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outputFile, gesdaFile, writer, checkOnlyInAppPackage);
+			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outputFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
 			log.info("Analysis completed");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,7 +200,7 @@ public class Main {
 		String mopSpecsDir = rvsecDir + "/rvsec/rvsec-mop/src/main/resources/jca";
 		String apksDir = rvsecDir + "/rv-android/apks_exp02/";
 
-		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/platforms";
+		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms";
 //		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/platforms-sable";
 		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
 
@@ -217,6 +218,7 @@ public class Main {
 
 		String gesdaFile = null;
 		boolean checkOnlyInAppPackage = false;
+		int timeout = 300;
 
 		Writer writer = new CsvWriter();
 		String outFile = "/home/pedro/tmp/teste.csv";
@@ -225,7 +227,7 @@ public class Main {
 
 		Main main = new Main();
 		try {
-			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage);
+			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -25,6 +25,9 @@ public class CommandLineArgs {
 
 	@Parameter(names = { "--gesda", "-g" }, description = "Gesda output file containing APK info", required = false)
 	private String gesdaFile;
+	
+	@Parameter(names = { "--timeout", "-t" }, description = "Data flow analysis timeout (in seconds). Default: 300", required = false)
+	private int timeout = 300;
 
 	@Parameter(names = { "--writer", "-w" }, description = "Output file type: csv or json. Default: csv")
 	private WriterType writerType = WriterType.csv;
@@ -63,6 +66,10 @@ public class CommandLineArgs {
 
 	public String getGesdaFile() {
 		return gesdaFile;
+	}
+	
+	public int getTimeout() {
+		return timeout;
 	}
 
 	public String getApk() {

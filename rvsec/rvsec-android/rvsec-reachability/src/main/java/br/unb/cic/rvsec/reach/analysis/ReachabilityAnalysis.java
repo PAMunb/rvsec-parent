@@ -59,6 +59,8 @@ public class ReachabilityAnalysis {
 			for (SootMethod sootMethod : sootClass.getMethods()) {
 				RvsecMethod method = new RvsecMethod(sootMethod);
 				clazz.addMethod(method);
+				
+//				System.out.println(" - "+sootMethod.getSignature());
 
 				// check if the method is reachable
 				if(reachableMethods.containsKey(sootMethod)) {
@@ -147,13 +149,36 @@ public class ReachabilityAnalysis {
 	}
 
 	private void processReachabilityToMop(RvsecMethod method, SootMethod sootMethod, Set<SootMethod> mopMethods) {
+//		if(sootMethod.getName().toLowerCase().contains("hash")) {		
+//			System.out.println("processReachabilityToMop ::: "+sootMethod.getSignature());
+//		}
+//		if("unreachableHash".equals(sootMethod.getName())) {
+//			System.out.println("unreachableHash .....................................");
+//			CallGraph cg = Scene.v().getCallGraph();
+////			cg.listener().forEachRemaining(c -> System.out.println(">> "+c.getTgt().method().getSignature()));
+////			cg.newListener().forEachRemaining(c -> System.out.println("> "+c.getTgt().method().getSignature()));
+//			Iterator<Edge> edgesOutOf = cg.edgesOutOf(sootMethod);
+//			while(edgesOutOf.hasNext()) {
+//				Edge edge = edgesOutOf.next();
+//				System.out.println(">>> "+edge.getTgt().method().getSignature());
+//			}
+//		}
 		for (SootMethod mopMethod : mopMethods) {
 			Optional<Path> pathOpt = analysisStrategy.findPath(sootMethod, mopMethod);
+//			if(sootMethod.getName().toLowerCase().contains("hash")) {
+//				System.out.println("has path to "+mopMethod.getSignature()+"? "+pathOpt.isPresent());
+//			}
 			if (pathOpt.isPresent()) {
+//				if(sootMethod.getName().toLowerCase().contains("hash")) {
+//					System.out.println("  - path to ::: "+mopMethod.getSignature());
+//				}
 				boolean isSuccessor = analysisStrategy.isSuccessor(sootMethod, mopMethod);
 				if (isSuccessor) {
 					method.setDirectlyReachesMop(true);
 					method.addMopMethodReached(mopMethod.getSignature());
+//					if(sootMethod.getName().toLowerCase().contains("hash")) {
+//						System.out.println("  - directly reaches MOP ::: "+mopMethod.getSignature());
+//					}
 				}
 				method.setReachesMop(true);
 				method.addPathToMop(pathOpt.get());
@@ -178,6 +203,7 @@ public class ReachabilityAnalysis {
 						if (pathOpt.isPresent()) {
 							Path path = pathOpt.get();
 							reachableMethods.put(method, path);
+							break;
 						}
 					}
 				}

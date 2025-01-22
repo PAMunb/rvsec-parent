@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,15 +21,17 @@ public class CsvWriter implements Writer {
     public void write(Set<RvsecClass> result, File out) {
         log.info("Saving results in: "+out.getAbsolutePath());
         try (PrintWriter pw = new PrintWriter(new FileWriter(out))) {
-            pw.println("className,isActivity,isMainActivity,methodName,reachable,reachesMop,directlyReachesMop,signature,mopMethodsReached");
+            pw.println("class,is_activity,is_main_activity,method,params,reachable,reaches_mop,directly_reaches_mop,signature,mop_methods_reached");
             for (RvsecClass clazz : result) {
                 for (RvsecMethod method : clazz.getMethods()) {
-                	String mopMethodsReached = "["+method.getMopMethodsReached().stream().collect(Collectors.joining(";"))+"]";
-                    pw.println(String.format("%s,%b,%b,%s,%b,%b,%b,\"%s\",\"%s\"",
+                	String params = "["+join(method.getMethodParams(), ",")+"]";
+                	String mopMethodsReached = "["+join(method.getMopMethodsReached(), ";")+"]";
+                    pw.println(String.format("%s,%b,%b,%s,\"%s\",%b,%b,%b,\"%s\",\"%s\"",
                             clazz.getClassName(),
                             clazz.isActivity(),
                             clazz.isMainActivity(),
                             method.getMethodName(),
+                            params,
                             method.isReachable(),
                             method.isReachesMop(),
                             method.isDirectlyReachesMop(),
@@ -42,4 +45,8 @@ public class CsvWriter implements Writer {
         }
     }
 
+    
+    private String join(Collection<String> collection, String join) {
+    	return collection.stream().collect(Collectors.joining(";"));
+    }
 }

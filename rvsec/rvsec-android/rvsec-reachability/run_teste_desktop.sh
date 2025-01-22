@@ -1,14 +1,15 @@
 #!/bin/bash
      
-# ANDROID_PLATFORMS_DIR="/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms"
-ANDROID_PLATFORMS_DIR="/home/pedro/desenvolvimento/aplicativos/android/platforms"
-MOP_SPECS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-mop/src/main/resources"
+ANDROID_PLATFORMS_DIR="/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms"
+#ANDROID_PLATFORMS_DIR="/home/pedro/desenvolvimento/aplicativos/android/platforms"
+MOP_SPECS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rvsec/rvsec-mop/src/main/resources/jca"
 RT_JAR="/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar"
 # WRITER="json"
 WRITER="csv"
+TIMEOUT=300
 
-# APKS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_exp02"
-APKS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini"
+APKS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_exp02"
+#APKS_DIR="/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini"
 OUT_DIR="/home/pedro/tmp"
 OUT_TIMES="$OUT_DIR/reach_tempos.txt"
 
@@ -31,6 +32,7 @@ if [[ -d "$APKS_DIR" ]]; then
                     --rt-jar $RT_JAR \
                     --output $output \
                     --writer $WRITER \
+                    --timeout $TIMEOUT \
                     --apk $APK \
                     2>&1 > /dev/null
             end=$(date +%s.%N)    

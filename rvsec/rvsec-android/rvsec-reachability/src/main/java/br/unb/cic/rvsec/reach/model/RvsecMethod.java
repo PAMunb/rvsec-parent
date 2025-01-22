@@ -8,9 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import soot.SootMethod;
+import soot.Type;
 
 public class RvsecMethod {
 	private final String methodName;
+	private final List<String> methodParams;
 	private final String methodSignature;
 	private final int modifiers;
 
@@ -35,12 +37,19 @@ public class RvsecMethod {
 
 	public RvsecMethod(SootMethod method) {
 		this.methodName = method.getName();
+		this.methodParams = method.getParameterTypes().stream()
+				.map(Type::toString)
+				.collect(Collectors.toList());
 		this.methodSignature = method.getSignature();
 		this.modifiers = method.getModifiers();
 	}
 
 	public String getMethodName() {
 		return methodName;
+	}
+
+	public List<String> getMethodParams() {
+		return methodParams;
 	}
 
 	public String getMethodSignature() {
@@ -115,7 +124,7 @@ public class RvsecMethod {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(directlyReachesMop, methodName, methodSignature, modifiers, possiblePath, possiblePathToMop, reachable, reachesMop);
+		return Objects.hash(directlyReachesMop, methodName, methodParams, methodSignature, modifiers, possiblePath, possiblePathToMop, reachable, reachesMop);
 	}
 
 	@Override
@@ -125,7 +134,7 @@ public class RvsecMethod {
 		if ((obj == null) || (getClass() != obj.getClass()))
 			return false;
 		RvsecMethod other = (RvsecMethod) obj;
-		return directlyReachesMop == other.directlyReachesMop && Objects.equals(methodName, other.methodName) && Objects.equals(methodSignature, other.methodSignature) && modifiers == other.modifiers
+		return directlyReachesMop == other.directlyReachesMop && Objects.equals(methodName, other.methodName) && Objects.equals(methodParams, other.methodParams) && Objects.equals(methodSignature, other.methodSignature) && modifiers == other.modifiers
 				&& Objects.equals(possiblePath, other.possiblePath) && Objects.equals(possiblePathToMop, other.possiblePathToMop) && reachable == other.reachable && reachesMop == other.reachesMop;
 	}
 

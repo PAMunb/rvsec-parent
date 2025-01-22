@@ -40,8 +40,9 @@ public class SootConfig {
 		config.setMergeDexFiles(true);
 		config.setEnableTypeChecking(true);
 		config.setEnableReflection(true);
+		config.setEnableExceptionTracking(true);
 		config.setEnableOriginalNames(true);
-		config.setEnableLineNumbers(true);
+		config.setEnableLineNumbers(true);		
 		config.setTaintAnalysisEnabled(false);
 		config.setDataFlowTimeout(timeout);
 		config.setMaxThreadNum(32);

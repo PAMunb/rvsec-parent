@@ -2,10 +2,15 @@ package br.unb.cic.rvsec.reach;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +22,9 @@ import com.fdu.se.sootanalyze.model.out.ApkInfoOut;
 import br.unb.cic.rvsec.apk.model.ActivityInfo;
 import br.unb.cic.rvsec.apk.model.AppInfo;
 import br.unb.cic.rvsec.apk.reader.AppReader;
-import br.unb.cic.rvsec.reach.analysis.JGraphReachabilityStrategy;
 import br.unb.cic.rvsec.reach.analysis.ReachabilityAnalysis;
 import br.unb.cic.rvsec.reach.analysis.ReachabilityStrategy;
+import br.unb.cic.rvsec.reach.analysis.SootReachabilityStrategy;
 import br.unb.cic.rvsec.reach.cli.CommandLineArgs;
 import br.unb.cic.rvsec.reach.gesda.GesdaReader;
 import br.unb.cic.rvsec.reach.model.Path;
@@ -60,8 +65,8 @@ public class Main {
 		log.info("Constructing callgraph ...");
 		infoflow.constructCallgraph();
 
-//		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); // TODO vir como parametro (CLI)
-		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new JGraphReachabilityStrategy();
+		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new SootReachabilityStrategy(); // TODO vir como parametro (CLI)
+//		ReachabilityStrategy<SootMethod, Path> analysisStrategy = new JGraphReachabilityStrategy();
 		Set<RvsecClass> result = reachabilityAnalysis(appInfo, mopMethods, entryPoints, analysisStrategy, gesdaFile);
 
 		writeResults(result, resultsFile, writer);
@@ -149,8 +154,8 @@ public class Main {
 	private static void execute(String[] args) {
 		long start = System.currentTimeMillis();
 
-//		executeCLI(args);
-		executeTest();
+		executeCLI(args);
+//		executeTest();
 
 		long time = System.currentTimeMillis() - start;
 		System.out.println("TIME: " + (time / 1000) + " sec.");
@@ -225,29 +230,39 @@ public class Main {
 //		Writer writer = new JsonWriter();
 //		String outFile = "/home/pedro/tmp/teste.json";
 
-		Main main = new Main();
-		try {
-			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		Main main = new Main();
+//		try {
+//			main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
-//		try (Stream<java.nio.file.Path> paths = Files.walk(java.nio.file.Path.of(apksDir))) {
-//			Main main = new Main();
-//            List<java.nio.file.Path> apks = paths.filter(path -> path.toString().endsWith(".apk")).collect(Collectors.toList());
-//			for (java.nio.file.Path path : apks) {
-//				apk = path.toAbsolutePath().toString();
-//				System.out.println("\n\n\n ************************************* APK: "+apk);
-//				outFile = String.format("/home/pedro/tmp/teste_%s.csv", path.getFileName().toString());
-//				try {
-//					main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+		try (Stream<java.nio.file.Path> paths = Files.walk(java.nio.file.Path.of(apksDir))) {
+			long total_time = 0;
+			Map<String, Long> map = new HashMap<>();
+			Main main = new Main();
+            List<java.nio.file.Path> apks = paths.filter(path -> path.toString().endsWith(".apk")).collect(Collectors.toList());
+			for (java.nio.file.Path path : apks) {
+				apk = path.toAbsolutePath().toString();
+				System.out.println("\n ************************************* APK: "+apk);
+				long start = System.currentTimeMillis();
+				outFile = String.format("/home/pedro/tmp/teste_%s.csv", path.getFileName().toString());
+				try {
+					main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				long end = System.currentTimeMillis();
+				long exec_time = end - start;
+				total_time += exec_time;
+				map.put(path.getFileName().toString(), exec_time);
+				System.out.println("exec_time="+(exec_time/1000)+" sec.");
+			}
+			map.forEach((k,v) -> System.out.println(k+"="+(v/1000)));
+			System.out.println("TOTAL: "+(total_time/1000)+" sec.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
 

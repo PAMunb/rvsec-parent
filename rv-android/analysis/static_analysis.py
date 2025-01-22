@@ -57,6 +57,7 @@ def run_gator(app: App, gator_file: str):
 
 
 def run_reachability(app: App, reach_file: str, mop_dir: str, gesda_file: str=None):
+    timeout = 300  # 5 min
     reach_jar = os.path.join(LIB_DIR, "reach", "rvsec-reach.jar")
     reach_cmd = Command("java", [
         "-jar",
@@ -73,6 +74,8 @@ def run_reachability(app: App, reach_file: str, mop_dir: str, gesda_file: str=No
         gesda_file,
         "--writer",
         "csv",
+        "--timeout",
+        timeout,
         "--apk",
         app.path
     ])

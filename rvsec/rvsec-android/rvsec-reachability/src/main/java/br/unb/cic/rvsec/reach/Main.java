@@ -154,11 +154,11 @@ public class Main {
 	private static void execute(String[] args) {
 		long start = System.currentTimeMillis();
 
-		executeCLI(args);
-//		executeTest();
+//		executeCLI(args);
+		executeTest();
 
 		long time = System.currentTimeMillis() - start;
-		System.out.println("TIME: " + (time / 1000) + " sec.");
+		log.info("Executed in " + (time / 1000) + " seconds.");
 	}
 
 	private static void executeCLI(String[] args) {
@@ -203,13 +203,14 @@ public class Main {
 	private static void executeTest() {
 		String rvsecDir = "/home/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec";
 		String mopSpecsDir = rvsecDir + "/rvsec/rvsec-mop/src/main/resources/jca";
-		String apksDir = rvsecDir + "/rv-android/apks_exp02/";
+//		String apksDir = rvsecDir + "/rv-android/apks_exp02/";
+		String apksDir = "/home/pedro/desenvolvimento/RV_ANDROID/ALL_APKS";
 
 		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/sdk/platforms";
 //		String androidPlatformsDir = "/home/pedro/desenvolvimento/aplicativos/android/platforms-sable";
 		String rtJarPath = "/home/pedro/.sdkman/candidates/java/8.0.302-open/jre/lib/rt.jar";
 
-		String apk = apksDir + "cryptoapp.apk";
+//		String apk = apksDir + "cryptoapp.apk";
 //		String apk = apksDir + "com.blogspot.e_kanivets.moneytracker_38.apk";
 //		String apk = apksDir + "com.gianlu.dnshero_40.apk";
 //		String apk = apksDir + "com.github.axet.hourlyreminder_476.apk";
@@ -236,30 +237,42 @@ public class Main {
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
-
+		
 		try (Stream<java.nio.file.Path> paths = Files.walk(java.nio.file.Path.of(apksDir))) {
 			long total_time = 0;
 			Map<String, Long> map = new HashMap<>();
-			Main main = new Main();
+			Map<String, String> errors = new HashMap<>();
+			Main main = new Main();			
             List<java.nio.file.Path> apks = paths.filter(path -> path.toString().endsWith(".apk")).collect(Collectors.toList());
+            int total_apks = apks.size();
+            int cont = 0;
 			for (java.nio.file.Path path : apks) {
-				apk = path.toAbsolutePath().toString();
-				System.out.println("\n ************************************* APK: "+apk);
+				if(map.containsKey(path.getFileName().toString())) {
+					continue;
+				}
+				String apk = path.toAbsolutePath().toString();
+				System.out.println(String.format("\n ************************************* APK(%d/%d): %s", ++cont, total_apks, apk));
 				long start = System.currentTimeMillis();
-				outFile = String.format("/home/pedro/tmp/teste_%s.csv", path.getFileName().toString());
+				outFile = String.format("/home/pedro/tmp/RV/reach/%s.csv", path.getFileName().toString());
 				try {
 					main.execute(apk, mopSpecsDir, androidPlatformsDir, rtJarPath, outFile, gesdaFile, writer, checkOnlyInAppPackage, timeout);
+					long end = System.currentTimeMillis();
+					long exec_time = end - start;
+					total_time += exec_time;
+					map.put(path.getFileName().toString(), exec_time);
+					System.out.println("exec_time="+(exec_time/1000)+" sec.");
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
-				long end = System.currentTimeMillis();
-				long exec_time = end - start;
-				total_time += exec_time;
-				map.put(path.getFileName().toString(), exec_time);
-				System.out.println("exec_time="+(exec_time/1000)+" sec.");
+					errors.put(path.getFileName().toString(), e.getMessage());
+				}				
 			}
+			System.out.println("\n\nRESULT: ");
 			map.forEach((k,v) -> System.out.println(k+"="+(v/1000)));
 			System.out.println("TOTAL: "+(total_time/1000)+" sec.");
+			System.out.println("APKS analisados: "+map.size());
+			System.out.println(".............................................");
+			System.out.println("\nERROS: "+errors.size());
+			errors.forEach((k,v) -> System.out.println(k+"="+v));
         } catch (Exception e) {
             e.printStackTrace();
         }

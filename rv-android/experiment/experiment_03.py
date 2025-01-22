@@ -7,6 +7,7 @@ from experiment.memory import Memory
 import analysis.reachable_methods_mop as reach
 import analysis.results_analysis as res
 import analysis.static_analysis as static
+from analysis.static_analysis import StaticAnalysisException
 import utils
 from android import Android
 from app import App
@@ -41,7 +42,7 @@ def _execute(repetitions: int, timeouts: list[int], tools: list[AbstractTool], m
 
     # memory_file indicates whether to
     #  - resume the experiment run (based on file content), OR
-    #  - start a new run (blank value)
+    #  - start a new run (blank file content)
     # If you are going to continue an execution, it is not necessary to pre-process the apks again ...
     if not memory_file:
         # generate monitors, instrument APKs and run static analysis
@@ -78,6 +79,7 @@ def run_experiment(repetitions: int, timeouts: list[int], tools: list[AbstractTo
             run(task, exec_manager, no_window)
     logging.info(f"Execution memory file: {exec_manager.memory_file}")
 
+
     #TODO ...rever
     logging.info(f"Verifying execution status: {exec_manager.statistics()}")
     for _ in range(3):  # 3 retries
@@ -87,6 +89,7 @@ def run_experiment(repetitions: int, timeouts: list[int], tools: list[AbstractTo
         for task in exec_manager.tasks:
             if not task.executed:
                 run(task, exec_manager, no_window)
+
 
     return exec_manager
 
@@ -121,9 +124,6 @@ def run_task(task: Task, no_window: bool):
             task.start_time = datetime.now()  # update start_time (after emulator is up)
             tool.execute(app, task.timeout, task.log_file)
             proc.kill()
-
-
-
 
 
 def pre_process_apks(generate_monitors: bool, instrument: bool, static_analysis: bool, base_results_dir: str):
@@ -188,6 +188,7 @@ def post_process(base_results_dir: str):
 
 
 def extract_all_methods():
+    # TODO: deprecated
     logging.info("Extracting methods")
     for file in os.listdir(INSTRUMENTED_DIR):
         if file.casefold().endswith(EXTENSION_APK):
@@ -202,15 +203,17 @@ def extract_all_methods():
 def run_static_analysis():
     logging.info("Running static analysis .........  ")
     for file in os.listdir(INSTRUMENTED_DIR):
-        print(f"file={file}")
         if file.casefold().endswith(EXTENSION_APK):
             app = App(os.path.join(APKS_DIR, file))
             base_name_template = app.name+"{}"
             gesda_file = os.path.join(INSTRUMENTED_DIR, base_name_template.format(EXTENSION_GESDA))
             gator_file = os.path.join(INSTRUMENTED_DIR, base_name_template.format(EXTENSION_GATOR))
-            # className,isActivity,isMainActivity,methodName,reachable,reachesMop,directlyReachesMop,signature
+            # class,is_activity,is_main_activity,method,params,reachable,reaches_mop,directly_reaches_mop,signature,mop_methods_reached
             reach_file = os.path.join(INSTRUMENTED_DIR, base_name_template.format(EXTENSION_REACH))
-            static.run_static_analysis(app, gesda_file, gator_file, reach_file)
+            try:
+                static.run_static_analysis(app, gesda_file, gator_file, reach_file)
+            except StaticAnalysisException as e:
+                pass
 
 
 def init_maps(apps: list[App]):

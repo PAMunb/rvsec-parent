@@ -1,4 +1,7 @@
-FROM phtcosta/rvsec_android:0.0.1
+FROM phtcosta/rvsec_android:0.7.0
+
+# Install NPM
+RUN apt install -qq -y --no-install-recommends npm
 
 WORKDIR /opt
 RUN git clone https://github.com/honeynet/droidbot.git && \
@@ -9,7 +12,7 @@ RUN git clone https://github.com/honeynet/droidbot.git && \
 
 #ENV VIRTUAL_ENV=/opt/rvsec/rv-android/venv
 WORKDIR /opt/rvsec
-RUN git clone --branch taint https://github.com/PAMunb/rvsec.git . && \
+RUN git clone --branch java21 https://github.com/PAMunb/rvsec.git . && \
     mvn clean install -DskipTests -DskipMopAgent && \
     mvn clean compile -f /opt/rvsec/rv-android/pom.xml && \
 #    python3 -m venv $VIRTUAL_ENV && \
@@ -45,6 +48,8 @@ ENV RV_SKIP_INSTRUMENT=false
 ENV RV_SKIP_STATIC_ANALYSIS=false
 ENV RV_SKIP_EXPERIMENT=false
 ENV RV_NO_WINDOW=true
+ENV RV_JCA_SPEC=true
+ENV RV_RT_JAR=/opt/java-se-8u44-ri/jre/lib/rt.jar
 
 #TODO receber o dir das specs tbm?
 

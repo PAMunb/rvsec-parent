@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.0.1
+VERSION=0.7.0
 IMAGE=phtcosta/rvandroid
 
 docker build --no-cache -t $IMAGE:$VERSION $(dirname $0)
@@ -15,4 +15,4 @@ echo "Imagem criada com sucesso!!!"
 
 # mandar imagem pro docker hub
 #docker login
-#docker push phtcosta/qtesting:0.0.1
+#docker push phtcosta/rvandroid:0.7.0

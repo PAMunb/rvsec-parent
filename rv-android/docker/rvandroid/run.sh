@@ -38,6 +38,6 @@ docker run -it --rm --device /dev/kvm --entrypoint "/bin/bash" --name rvsec-01 \
 -v $INSTRUMENTED_DIR:/opt/rvsec/rv-android/out \
 -v $RESULTS_DIR:/opt/rvsec/rv-android/results \
 -e MEMORY=6144 -e CORES=2 \
-phtcosta/rvandroid:0.0.1
+phtcosta/rvandroid:0.7.0
 
 #docker run -d --device /dev/kvm -p 5555:5555 -v androiddata:/data -e PARTITION=24576 -e MEMORY=6144 -e CORES=2 --name docker-android-emulator cndaqiang/docker-android-emulator:api-33

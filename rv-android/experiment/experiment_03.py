@@ -139,7 +139,7 @@ def pre_process_apks(generate_monitors: bool, instrument: bool, static_analysis:
         rvandroid.instrument_apks(results_dir=base_results_dir)
     if static_analysis:
         extract_all_methods()
-        # run_static_analysis()
+        run_static_analysis()
 
 
 def post_process_task(task: Task):

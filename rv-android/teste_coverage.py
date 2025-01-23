@@ -15,7 +15,7 @@ def tmp01():
 
 
 def execute(apk_name, result_dir, result_file):
-    rvsec_errors, called_methods = parser.parse_logcat_file(result_file)
+    rvsec_errors, called_methods, _ = parser.parse_logcat_file(result_file)
 
     all_methods = {}
     all_methods_file_name = apk_name + EXTENSION_METHODS

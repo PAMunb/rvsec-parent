@@ -141,7 +141,7 @@ def initialize_results(results_dir: str, memory: Memory):
                             # - o conjunto de erros (crypto misuse) encontrados
                             # - um mapa contendo os métodos chamados durante a execução (não conta a quantidade de vezes que foi chamado, apenas se foi chamado)
                             #   as chaves são os nomes das classes e o valor é o conjunto dos métodos chamados
-                            rvsec_errors, called_methods = parser.parse_logcat_file(os.path.join(apk_folder_path, file))
+                            rvsec_errors, called_methods, _ = parser.parse_logcat_file(os.path.join(apk_folder_path, file))
                             task = memory.get_task(apk, rep, timeout, tool)
                             # print(f"task={task}")
                             rvsec_error_msgs = set()

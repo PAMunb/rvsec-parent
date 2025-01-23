@@ -92,7 +92,7 @@ class RvAndroid(object):
         logging.debug("APK instrumented: {}".format(signed_apk))
 
     def __decompile_apk(self, app: App):
-        logging.info("Decompiling {}".format(app.name))
+        logging.info("Decompiling: {}".format(app.name))
         utils.reset_folder(TMP_DIR)
         no_monitor_jar_name = "no_monitor_{}.jar".format(app.name)
         no_monitor_jar = os.path.join(TMP_DIR, no_monitor_jar_name)
@@ -113,7 +113,6 @@ class RvAndroid(object):
         utils.execute_command(dex2jar_cmd, tag, True)
         if os.path.exists(exception_file):
             raise CommandException(tag, "-1", "See error in {}".format(exception_file))
-
 
     @staticmethod
     def __d2j_asm_verify(jar_file: str, skip_verify=False):

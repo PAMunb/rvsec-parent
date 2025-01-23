@@ -83,7 +83,7 @@ def get_errors(task: Task, results_dir: str):
     base_name = "{0}__{1}__{2}__{3}".format(task.apk, task.repetition, task.timeout, task.tool)
     apk_results_dir = os.path.join(results_dir, task.apk)
     task.logcat_file = os.path.join(apk_results_dir, "{}{}".format(base_name, EXTENSION_LOGCAT))
-    rvsec_errors, _ = parser.parse_logcat_file(task.logcat_file)
+    rvsec_errors, _, _ = parser.parse_logcat_file(task.logcat_file)
     for error in rvsec_errors:
         errors.append({
             "msg": error.unique_msg,

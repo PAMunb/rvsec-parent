@@ -154,8 +154,8 @@ public class Main {
 	private static void execute(String[] args) {
 		long start = System.currentTimeMillis();
 
-//		executeCLI(args);
-		executeTest();
+		executeCLI(args);
+//		executeTest();
 
 		long time = System.currentTimeMillis() - start;
 		log.info("Executed in " + (time / 1000) + " seconds.");

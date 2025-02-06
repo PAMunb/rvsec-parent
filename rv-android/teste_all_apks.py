@@ -12,7 +12,7 @@ x02_jca_file = "exp02_jca_results.json"
 
 
 def copy_apks(from_dir, to_dir, apks, fdroid):
-    print("Copiando apks ...")
+    print("Copiando apks ... 123")
     for apk in apks:
         if apks[apk]["x01_generic"] and apks[apk]["x01_jca"] and fdroid[apk]["package"]:
             from_file = os.path.join(from_dir, apk)

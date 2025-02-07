@@ -2,14 +2,12 @@ import csv
 import glob
 import json
 import logging
-import os
 import sys
 
-import analysis.coverage as cov
-from constants import EXTENSION_METHODS, RVSEC_ERRORS, REPETITIONS, TIMEOUTS, TOOLS, SUMMARY, METHOD_COVERAGE, \
+from rvandroid.constants import RVSEC_ERRORS, REPETITIONS, TIMEOUTS, TOOLS, SUMMARY, METHOD_COVERAGE, \
     METHODS_JCA_COVERAGE, ACTIVITIES_COVERAGE
 
-import analysis.results_merger as merger
+import rvandroid.analysis.results_merger as merger
 
 
 def cont_apks_with_rvsec_errors(file):

@@ -5,18 +5,17 @@ import os
 import sys
 import time
 from argparse import Namespace
-from datetime import datetime
 
-import utils
-from constants import *
-from experiment import config as experiment_config
-from experiment import experiment_03
-from tools.tool_spec import AbstractTool
+from rvandroid import utils
+from rvandroid.constants import *
+from rvandroid.experiment import config as experiment_config
+from rvandroid.experiment import experiment_03
+from rvandroid.tools.tool_spec import AbstractTool
 
 available_tools: dict[str, AbstractTool] = {}
 
 program_description = '''
-Executes the 'Experiment 02' ... 
+Executes the 'Experiment 03' ... 
 
 Examples:    
 $ python main.py --no_window -tools monkey droidbot -r 3 -t 120 300 600 900
@@ -59,15 +58,15 @@ def run_cli():
         logging.info(f"Sleeping for {delay} seconds ...")
         time.sleep(delay)
 
-    logging.info('############# STARTING EXPERIMENT #############')
+    logging.info("############# STARTING EXPERIMENT #############")
     start = time.time()
 
     experiment_03.execute()
 
     end = time.time()
     elapsed = end - start
-    logging.info('It took {0} to complete'.format(utils.to_readable_time(elapsed)))
-    logging.info('############# ENDING EXPERIMENT #############')
+    logging.info("It took {0} to complete".format(utils.to_readable_time(elapsed)))
+    logging.info("############# ENDING EXPERIMENT #############")
 
 
 def load_tools():
@@ -78,11 +77,11 @@ def load_tools():
      This module must also declare a class named ToolSpec,
      which should inherit from AbstractTool.
     """
-    for subdir, dirs, files in os.walk('.' + os.sep + 'tools'):
+    for subdir, dirs, files in os.walk('.' + os.sep + "rvandroid" + os.sep + "tools"):
         for filename in files:
-            if filename == 'tool.py':
+            if filename == "tool.py":
                 tool_module = importlib.import_module(qualified_name(subdir + os.sep + filename))
-                tool_class = getattr(tool_module, 'ToolSpec')
+                tool_class = getattr(tool_module, "ToolSpec")
                 tool_instance = tool_class()
                 available_tools[tool_instance.name] = tool_instance
     experiment_config.available_tools = available_tools.values()
@@ -199,35 +198,21 @@ def run_local():
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logging.getLogger("androguard").setLevel(logging.ERROR)
 
-    inicio = datetime.now()
-    print(inicio)
-    teste = datetime.now() - inicio
-
     # experiment_config.repetitions = 3
     # experiment_config.timeouts = [60, 90, 120, 180, 300]
     # experiment_config.tools = __get_tools(
     #     ["monkey", "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid",
     #      "droidmate", "ape", "ares", "fastbot", "qtesting"])
 
-    _min = 60
-    _3_min = 3 * _min
-    _5_min = 5 * _min
-    _10_min = 2 * _5_min
-    _30_min = 3 * _10_min
-    _1_hour = 60 * _min
-    _3_hour = 3 * _1_hour
-
     experiment_config.repetitions = 1
     experiment_config.timeouts = [60]
-    experiment_config.tools = __get_tools(["droidmate"])
-    # "ape", "fastbot", "droidbot_dfs_greedy", "ares", "qtesting"
-    # testados: monkey, ape, fastbot, droidmate
-    # "droidbot", "droidbot_dfs_greedy", "droidbot_bfs_naive", "droidbot_bfs_greedy", "humanoid"
+    # experiment_config.tools = __get_tools(["ape", "ares", "droidmate", "fastbot", "monkey"])
+    experiment_config.tools = __get_tools(["monkey"])
 
-    experiment_config.generate_monitors = True
-    experiment_config.instrument = True
-    experiment_config.static_analysis = True
-    experiment_config.no_window = True
+    experiment_config.generate_monitors = False
+    experiment_config.instrument = False
+    experiment_config.static_analysis = False
+    experiment_config.no_window = False
     experiment_config.skip_experiment = False
 
     experiment_config.memory_file = ""
@@ -245,5 +230,5 @@ def run_local():
 if __name__ == '__main__':
     load_tools()
 
-    run_cli()
-    # run_local()
+    # run_cli()
+    run_local()

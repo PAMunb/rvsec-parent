@@ -1,9 +1,8 @@
 import json
 import os
-import analysis.coverage as cov
-import log.logcat_parser as parser
-import analysis.reachable_methods_mop as reach
-from constants import EXTENSION_METHODS
+from rvandroid import analysis as cov, analysis as reach
+import rvandroid.log.logcat_parser as parser
+from rvandroid.constants import EXTENSION_METHODS
 
 
 def tmp01():

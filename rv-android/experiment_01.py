@@ -3,17 +3,14 @@ import os.path
 import shutil
 
 #import analysis.methods_extractor as me
-import analysis.reachable_methods_mop as reach
-import analysis.results_analysis as res
-import utils
-from android import Android
-from app import App
-from commands.command import Command
-from constants import EXTENSION_APK, EXTENSION_METHODS, EXTENSION_LOGCAT, EXTENSION_TRACE
-from rvandroid import RvAndroid
-from rvsec import RVSec
+from rvandroid.android import Android
+from rvandroid.app import App
+from rvandroid.commands import Command
+from rvandroid.constants import EXTENSION_APK, EXTENSION_METHODS, EXTENSION_LOGCAT, EXTENSION_TRACE
+from rvandroid import RvAndroid, analysis as reach, analysis as res
+from rvandroid.rvsec import RVSec
 from settings import *
-from tools.tool_spec import AbstractTool
+from rvandroid.tools import AbstractTool
 
 logging = logging_api.getLogger(__name__)
 

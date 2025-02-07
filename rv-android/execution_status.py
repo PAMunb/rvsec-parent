@@ -1,14 +1,12 @@
 import json
 import sys
-import time
-from datetime import timedelta, datetime
 
-import utils
-from experiment.memory import Memory
+from rvandroid import utils
+from rvandroid.experiment import Memory
 import os
-from experiment.task import Task, DEFAULT_DATETIME
-import log.logcat_parser as parser
-from constants import EXTENSION_LOGCAT
+from rvandroid.experiment.task import Task, DEFAULT_DATETIME
+import rvandroid.log.logcat_parser as parser
+from rvandroid.constants import EXTENSION_LOGCAT
 
 def status(memory_file: str) -> dict:
     results_dir = os.path.dirname(memory_file)

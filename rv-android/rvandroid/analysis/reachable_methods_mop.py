@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 import csv
-import json
 import os
 import sys
+import time
 
 import networkx as nx
 from androguard.core.analysis.analysis import Analysis, MethodAnalysis
@@ -9,12 +10,13 @@ from androguard.core.bytecodes.apk import APK
 from androguard.misc import AnalyzeAPK
 from networkx import MultiDiGraph
 
-from rvandroid.commands import Command
+from rvandroid.commands.command import Command
 from settings import LIB_DIR, WORKING_DIR
 
 from settings import MOP_DIR
 from rvandroid.constants import *
 
+# DEPRECATED: uses androguard ... new version uses a custom implementation using soot
 
 def extract_reachable_methods(apk_path: str, out_file: str):
     reachable = reachable_methods_that_uses_jca(apk_path)
@@ -39,10 +41,7 @@ def reachable_methods_that_uses_jca(apk_path: str):
 
     for m in cg:
         clazz = get_class_name(m)
-
-        print("clazz={} .... package={}".format(clazz, apk.get_package()))
-
-        if apk.get_package() in clazz or "com.jonbanjo.cupsprint" in clazz:
+        if apk.get_package() in clazz:
             method = str(m.name)
 
             if is_constructor_or_static_initializer(method):
@@ -51,16 +50,11 @@ def reachable_methods_that_uses_jca(apk_path: str):
             if clazz not in reachable:
                 reachable[clazz] = {IS_ACTIVITY: clazz in apk.get_activities(), METHODS: {}}
             if method not in reachable[clazz][METHODS]:
-                # REACHABLE: alcancavel por algum entrypoint
-                # USE_JCA: usa diretamente jca (chama um metodo jca dentro desse metodo)
-                # REACHES_JCA: alcanca algum metodo jca
-                reachable[clazz][METHODS][method] = {REACHABLE: False, USE_JCA: False, REACHES_JCA: False, "node": m}
+                reachable[clazz][METHODS][method] = {REACHABLE: False, USE_JCA: False}
 
-            for jca_method in methods_used_in_specs:
-                if cg.has_successor(m, jca_method):
+            for mop_method in methods_used_in_specs:
+                if cg.has_successor(m, mop_method):
                     reachable[clazz][METHODS][method][USE_JCA] = True
-                if nx.has_path(cg, m, jca_method):
-                    reachable[clazz][METHODS][method][REACHES_JCA] = True
 
     for m in reachable_methods:
         clazz = get_class_name(m)
@@ -68,30 +62,6 @@ def reachable_methods_that_uses_jca(apk_path: str):
         if is_constructor_or_static_initializer(method):
             continue
         reachable[clazz][METHODS][method][REACHABLE] = True
-
-    for clazz in reachable:
-        print("*************** class={}".format(clazz))
-        for method in reachable[clazz][METHODS]:
-            m = reachable[clazz][METHODS][method]
-            if m[REACHES_JCA]: # and not m[USE_JCA]:
-                paths = []
-                print("***** method={}".format(method))
-                for jca_method in methods_used_in_specs:
-                    all_simple_paths = nx.all_simple_paths(cg, source=m["node"], target=jca_method)
-                    for path___ in all_simple_paths:
-                        path = []
-                        first = True
-                        xxx: MethodAnalysis
-                        for xxx in path___:
-                            if not first:
-                                path.append("{}.{}".format(get_class_name(xxx), xxx.name))
-                            else:
-                                first = False
-                            # print("{} :: {} ::: {} :::: {}".format(get_class_name(xxx), xxx.name, xxx.full_name, xxx.get_descriptor()))
-                        paths.append(path)
-                m["paths"] = paths
-            m["node"] = None
-
 
     return reachable
 
@@ -128,7 +98,9 @@ def get_class_name(m: MethodAnalysis):
 
 
 def get_javamop_methods(mop_specs_dir: str):
-    methods_file = os.path.join(WORKING_DIR, 'methods_used_in_specs.txt')
+    current_time_ms = str(int(round(time.time() * 1000)))
+    methods_filename = "{}_{}".format(current_time_ms, 'methods_used_in_specs.txt')
+    methods_file = os.path.join(WORKING_DIR, methods_filename)
     mop_extractor_jar = os.path.join(LIB_DIR, 'mop-extractor', 'mop-extractor.jar')
     mop_extractor_cmd = Command("java", [
         '-jar',
@@ -225,17 +197,3 @@ def uses_jca(a: Analysis, entrypoints: set, methods: set):
             if nx.has_path(cg, e, m):
                 return True
     return False
-
-
-if __name__ == '__main__':
-    base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_examples"
-    apk = "cryptoapp.apk"
-
-    # base_dir = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/apks_mini"
-    # apk = "com.jonbanjo.cupsprintservice_23.apk"
-
-    reachable = reachable_methods_that_uses_jca(os.path.join(base_dir, apk))
-    # print(reachable)
-
-    json_formatted_str = json.dumps(reachable, indent=2)
-    print(json_formatted_str)

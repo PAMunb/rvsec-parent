@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     log_file = "/pedro/desenvolvimento/workspaces/workspaces-doutorado/workspace-rv/rvsec/rv-android/results/20241102083427/cryptoapp.apk/cryptoapp.apk__1__600__ape.logcat"  # Substitua pelo nome do seu arquivo
     # rvsec_errors, called_methods = execute(log_file)
-    import log.logcat_parser as parser
+    import rvandroid.log.logcat_parser as parser
     rvsec_errors, called_methods, _ = parser.parse_logcat_file(log_file)
 
     print("ERROS: {}".format(len(rvsec_errors)))

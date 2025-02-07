@@ -12,10 +12,9 @@ from google_play_scraper import app
 from scikitmcda.constants import MAX, EnhancedAccuracy_
 from scikitmcda.topsis import TOPSIS
 
-import analysis.reachable_methods_mop as reach
-from constants import *
-from rvandroid import RvAndroid
-from rvsec import RVSec
+from rvandroid.constants import *
+from rvandroid import RvAndroid, analysis as reach
+from rvandroid.rvsec import RVSec
 from settings import *
 
 

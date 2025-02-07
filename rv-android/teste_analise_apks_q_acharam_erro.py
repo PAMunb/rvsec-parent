@@ -1,19 +1,12 @@
-import csv
-import glob
-import json
 import logging
-import os
 import sys
-from csv import DictReader, DictWriter
-import analysis.coverage as cov
-from constants import *
+from csv import DictReader
+from rvandroid.constants import *
 import numpy as np
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-import analysis.results_merger as merger
 
 def read_fdroid(planilha_fdroid_path):
     apps = {}

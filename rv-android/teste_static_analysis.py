@@ -1,16 +1,11 @@
 import logging
 import sys
-import os
-import utils
-import analysis.static_analysis as static
-from settings import INSTRUMENTED_DIR
+import rvandroid.analysis.static_analysis as static
 # import analysis.methods_extractor as me
-import utils
-from commands.command import Command
-from constants import EXTENSION_GESDA, EXTENSION_GATOR
+from rvandroid.constants import EXTENSION_GESDA, EXTENSION_GATOR
 # from task import Task
 from settings import *
-from app import App
+
 
 def runXXX(apks_dir: str):
     apks = utils.get_apks(apks_dir)

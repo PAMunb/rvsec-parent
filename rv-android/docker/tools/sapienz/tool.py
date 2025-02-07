@@ -1,7 +1,7 @@
 import os
 
-from app import App
-from commands.command import Command
+from rvandroid.app import App
+from rvandroid.commands import Command
 from ..tool_spec import AbstractTool
 
 

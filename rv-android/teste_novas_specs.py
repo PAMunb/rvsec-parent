@@ -2,10 +2,9 @@ import logging
 import shutil
 import sys
 
-import utils
-from constants import *
+from rvandroid.constants import *
 from rvandroid import RvAndroid
-from rvsec import RVSec
+from rvandroid.rvsec import RVSec
 from settings import *
 
 

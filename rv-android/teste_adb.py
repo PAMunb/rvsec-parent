@@ -1,6 +1,5 @@
-import utils
-from app import App
-from commands.command import Command
+from rvandroid import utils
+from rvandroid.commands import Command
 
 def teste01():
     check_emulator_cmd = Command('adb', ['-s', 'emulator-5554', 'shell', 'getprop', 'init.svc.bootanim'], timeout)
